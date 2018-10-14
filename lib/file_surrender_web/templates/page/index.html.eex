@@ -1,0 +1,91 @@
+<div class="jumbotron">
+  <h2><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h2>
+  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
+</div>
+
+
+<!-- <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1930248007090229',
+      cookie     : true,
+      xfbml      : true,
+      version    : '{api-version}'
+    });
+
+    FB.AppEvents.logPageView();
+
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script> -->
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = 'https://connect.facebook.net/ru_RU/sdk.js#xfbml=1&version=v3.1&appId=1930248007090229&autoLogAppEvents=1';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<!-- <div class="row marketing">
+  <div class="col-lg-6">
+    <h4>Resources</h4>
+    <ul>
+      <li>
+        <a href="http://phoenixframework.org/docs/overview">Guides</a>
+      </li>
+      <li>
+        <a href="https://hexdocs.pm/phoenix">Docs</a>
+      </li>
+      <li>
+        <a href="https://github.com/phoenixframework/phoenix">Source</a>
+      </li>
+    </ul>
+  </div> -->
+
+  <%= if @current_user do %>
+    <h2>Welcome, <%= @current_user.name %>!</h2>
+    <img src="<%= @current_user.avatar %>" class="img-circle"/>
+    <%= if @code do %>
+      <p>
+        <strong>Code</strong>
+        <br/>
+        <%= @code %>
+      </p>
+    <% else %>
+      <strong>No code</strong>
+    <% end %>
+    <%= button "Logout", to: auth_path(@conn, :delete), method: :delete, class: "btn btn-danger" %>
+    <br>
+    <span><%= link "Secret", to: entry_path(@conn, :index), class: "btn btn-default btn-xs" %></span>
+  <% else %>
+    <a class="btn btn-primary btn-lg" href="/auth/google">
+      <i class="fa fa-google"></i>
+      Sign in with Google
+    </a>
+    <div class="fb-login-button" data-width="28" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+  <% end %>
+
+  <!-- <div class="col-lg-6">
+    <h4>Help</h4>
+    <ul>
+      <li>
+        <a href="http://groups.google.com/group/phoenix-talk">Mailing list</a>
+      </li>
+      <li>
+        <a href="http://webchat.freenode.net/?channels=elixir-lang">#elixir-lang on freenode IRC</a>
+      </li>
+      <li>
+        <a href="https://twitter.com/elixirphoenix">@elixirphoenix</a>
+      </li>
+    </ul>
+  </div> -->
+</div>

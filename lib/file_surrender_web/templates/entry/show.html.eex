@@ -1,0 +1,23 @@
+<h2>Show Entry</h2>
+
+<ul>
+
+  <li>
+    <strong>Uid:</strong>
+    <%= @entry.uid %>
+  </li>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @entry.name %>
+  </li>
+
+  <li>
+    <strong>Secret:</strong>
+    <%= @entry.secret %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: entry_path(@conn, :edit, @entry) %></span>
+<span><%= link "Back", to: entry_path(@conn, :index) %></span>
