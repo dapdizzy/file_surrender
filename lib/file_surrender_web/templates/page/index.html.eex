@@ -40,12 +40,6 @@
   VK.init({apiId: 6720615});
 </script>
 
-<!-- VK Widget -->
-<div id="vk_auth"></div>
-<script type="text/javascript">
-  VK.Widgets.Auth("vk_auth", {"authUrl":"/auth/vk/callback"});
-</script>
-
 <!-- <div class="row marketing">
   <div class="col-lg-6">
     <h4>Resources</h4>
@@ -83,6 +77,14 @@
       Sign in with Google
     </a>
     <div class="fb-login-button" data-width="28" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+    <!-- VK Widget -->
+    <!-- <div id="vk_auth"></div>
+    <script type="text/javascript">
+      VK.Widgets.Auth("vk_auth", {"authUrl":"/auth/vk/callback"});
+    </script> -->
+    <% vk_client_id = System.get_env("VK_CLIENT_ID") %>
+    <!-- <% vk_client_secret = System.get_env("VK_CLIENT_SECRET") %> -->
+    <button onclick="location.href='https://oauth.vk.com/authorize?client_id=<?= vk_client_id %>&display=page&redirect_uri=https://file-surrender.herokuapp.com/auth/vk/callback?scope=friends&response_type=code&v=5.85;">Войти через VK</button>
   <% end %>
 
   <!-- <div class="col-lg-6">
