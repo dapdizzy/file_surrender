@@ -33,7 +33,8 @@ config :logger, :console,
 config :ueberauth, Ueberauth,
   providers: [
     google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]},
-    facebook: {Ueberauth.Strategy.Facebook, [default_scope: "email,public_profile", display: "popup"]}
+    facebook: {Ueberauth.Strategy.Facebook, [default_scope: "email,public_profile", display: "popup"]},
+    vk: {Ueberauth.Strategy.VK, []}
   ]
 
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
@@ -43,6 +44,10 @@ config :ueberauth, Ueberauth.Strategy.Google.OAuth,
 config :ueberauth, Ueberauth.Strategy.Facebook.OAuth,
   client_id: System.get_env("FACEBOOK_CLIENT_ID"),
   client_secret: System.get_env("FACEBOOK_CLIENT_SECRET")
+
+config :ueberauth, Ueberauth.Strategy.VK.OAuth,
+  client_id: System.get_env("VK_CLIENT_ID"),
+  client_secret: System.get_env("VK_CLIENT_SECRET")
 
 config :file_surrender, FileSurrender.Guardian,
   issuer: "file_surrender",

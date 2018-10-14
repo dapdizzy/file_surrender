@@ -48,8 +48,10 @@ defmodule FileSurrender.Mixfile do
       {:ueberauth, "~> 0.4"},
       {:ueberauth_google, "~> 0.7"},
       {:ueberauth_facebook, "~> 0.7"},
+      {:ueberauth_vk, "~> 0.3"},
       # {:argon2_elixir, "~> 1.3", runtime: false}
-      {:guardian, "~> 1.0"}
+      {:guardian, "~> 1.0"},
+      {:httpoison, "~> 1.3"}
     ]
   end
 

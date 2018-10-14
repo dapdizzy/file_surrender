@@ -35,6 +35,17 @@
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 
+<script type="text/javascript" src="https://vk.com/js/api/openapi.js?159"></script>
+<script type="text/javascript">
+  VK.init({apiId: 6720615});
+</script>
+
+<!-- VK Widget -->
+<div id="vk_auth"></div>
+<script type="text/javascript">
+  VK.Widgets.Auth("vk_auth", {"authUrl":"/auth/vk/callback"});
+</script>
+
 <!-- <div class="row marketing">
   <div class="col-lg-6">
     <h4>Resources</h4>
