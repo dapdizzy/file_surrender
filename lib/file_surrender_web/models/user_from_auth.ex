@@ -30,7 +30,7 @@ defmodule UserFromAuth do
   # end
 
   defp basic_info(auth) do
-    %{id: auth.uid || auth.id, name: name_from_auth(auth), avatar: avatar_from_auth(auth)}
+    %{id: auth.uid || auth.raw_info.token["id"] |> to_string(), name: name_from_auth(auth), avatar: avatar_from_auth(auth)}
   end
 
   defp name_from_auth(auth) do
