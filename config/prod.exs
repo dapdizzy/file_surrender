@@ -1,9 +1,5 @@
 use Mix.Config
 
-defp get_encryption_keys() do
-  System.get_env("ENCRYPTION_KEYS") || raise "ENCRYPTION_KEYS var is not defined"
-end
-
 # For production, we often load configuration from external
 # sources, such as your system environment. For this reason,
 # you won't find the :http configuration below, but set inside
@@ -65,7 +61,7 @@ config :logger, level: :info
 
 # Configure Encryption.AES
 config :file_surrender, Encryption.AES,
-  keys: get_encryption_keys() |> String.split(",", trim: true)
+  keys: Encryption.Helper.get_encryption_keys() |> String.split(",", trim: true)
 
 config :file_surrender, FileSurrenderWeb.Endpoint,
   load_from_system_env: true,
