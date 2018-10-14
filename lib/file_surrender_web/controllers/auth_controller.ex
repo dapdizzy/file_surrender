@@ -1,5 +1,6 @@
 defmodule FileSurrenderWeb.AuthController do
   use FileSurrenderWeb, :controller
+  plug FileSurrenderWeb.Plugs.VKHash
   plug Ueberauth
 
   require Logger
