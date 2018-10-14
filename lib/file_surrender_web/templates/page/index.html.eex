@@ -82,9 +82,13 @@
     <script type="text/javascript">
       VK.Widgets.Auth("vk_auth", {"authUrl":"/auth/vk/callback"});
     </script> -->
-    <% vk_client_id = System.get_env("VK_CLIENT_ID") %>
+    <a class="btn btn-primary btn-lg" href="/auth/vk">
+      <i class="fa fa-google"></i>
+      Sign in with VK
+    </a>
+    <!-- <% vk_client_id = System.get_env("VK_CLIENT_ID") %> -->
     <!-- <% vk_client_secret = System.get_env("VK_CLIENT_SECRET") %> -->
-    <button onclick="location.href='https://oauth.vk.com/authorize?client_id=<?= vk_client_id %>&display=page&redirect_uri=https://file-surrender.herokuapp.com/auth/vk/callback?scope=friends&response_type=code&v=5.85;">Войти через VK</button>
+    <!-- <button onclick="location.href='https://oauth.vk.com/authorize?client_id=<?= vk_client_id %>&display=page&redirect_uri=https://file-surrender.herokuapp.com/auth/vk/callback?scope=friends&response_type=code&v=5.85;">Войти через VK</button> -->
   <% end %>
 
   <!-- <div class="col-lg-6">
