@@ -17,7 +17,8 @@ defmodule FileSurrenderWeb.AuthController do
     |> redirect(to: "/")
   end
 
-  def callback(%{assigns: %{ueberauth_failure: _failrure}} = conn, _params) do
+  def callback(%{assigns: %{ueberauth_failure: _failrure} = assigns} = conn, _params) do
+    Logger.debug("ueberauth failure. Assigns: #{inspect assigns}")
     conn
     |> put_flash(:error, "Failed to log in.")
     |> redirect(to: "/")
