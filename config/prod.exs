@@ -59,9 +59,11 @@ config :logger, level: :info
 #     config :file_surrender, FileSurrenderWeb.Endpoint, server: true
 #
 
+encryption_keys = System.get_env("ENCRYPTION_KEYS") || raise("ENCRYPTION_KEYS environment variable is not set")
+
 # Configure Encryption.AES
 config :file_surrender, Encryption.AES,
-  keys: Encryption.Helper.get_encryption_keys() |> String.split(",", trim: true)
+  keys: encryption_keys |> String.split(",", trim: true)
 
 config :file_surrender, FileSurrenderWeb.Endpoint,
   load_from_system_env: true,
