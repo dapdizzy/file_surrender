@@ -6,6 +6,7 @@ defmodule FileSurrender.Secure.Entry do
 
   require Logger
 
+  @primary_key {:id, Encryption.HashedIdField, read_after_writes: true}
   schema "entries" do
     field :name, :binary
     field :secret, EncryptedField

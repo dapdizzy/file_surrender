@@ -51,7 +51,8 @@ defmodule FileSurrender.Mixfile do
       {:ueberauth_vk, "~> 0.3"},
       # {:argon2_elixir, "~> 1.3", runtime: false}
       {:guardian, "~> 1.0"},
-      {:httpoison, "~> 1.3"}
+      {:httpoison, "~> 1.3"},
+      {:hashids, "~> 2.0"}
     ]
   end
 

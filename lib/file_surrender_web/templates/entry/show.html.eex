@@ -2,10 +2,10 @@
 
 <ul>
 
-  <li>
+  <!-- <li>
     <strong>Uid:</strong>
     <%= @entry.uid %>
-  </li>
+  </li> -->
 
   <li>
     <strong>Name:</strong>
