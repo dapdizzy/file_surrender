@@ -76,7 +76,11 @@
       <i class="fa fa-google"></i>
       Sign in with Google
     </a>
-    <div class="fb-login-button" data-width="28" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
+    <a class="btn btn-primary btn-lg" href="/auth/facebook">
+      <i class="fa fa-facebook"></i>
+      Sign in with Facebook
+    </a>
+    <!-- <div class="fb-login-button" data-width="28" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div> -->
     <!-- VK Widget -->
     <!-- <div id="vk_auth"></div>
     <script type="text/javascript">
