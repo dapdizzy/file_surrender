@@ -59,7 +59,7 @@
   <%= if @current_user do %>
     <h2>Welcome, <%= @current_user.name %>!</h2>
     <img src="<%= @current_user.avatar %>" class="img-circle"/>
-    <%= if @code do %>
+    <!-- <%= if @code do %>
       <p>
         <strong>Code</strong>
         <br/>
@@ -67,7 +67,7 @@
       </p>
     <% else %>
       <strong>No code</strong>
-    <% end %>
+    <% end %> -->
     <%= button "Logout", to: auth_path(@conn, :delete), method: :delete, class: "btn btn-danger" %>
     <br>
     <span><%= link "Secret", to: entry_path(@conn, :index), class: "btn btn-link" %></span>

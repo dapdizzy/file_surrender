@@ -33,7 +33,7 @@ defmodule FileSurrenderWeb.AuthController do
         |> put_flash(:info, "Successfully authenticated.")
         # |> put_session(:current_user, user)
         |> Guardian.Plug.sign_in(FileSurrender.Guardian, user)
-        |> put_session(:code, params["code"])
+        # |> put_session(:code, params["code"])
         |> redirect(to: "/")
       {:error, reason} ->
         conn
