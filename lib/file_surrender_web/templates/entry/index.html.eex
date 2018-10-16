@@ -26,5 +26,4 @@
 </table>
 
 <span><%= link "New Entry", to: entry_path(@conn, :new) %></span>
-
-<span><%= link "Main page", to: page_path(@conn, :index), class: "btn btn-block" %></span>
+<span><%= link "Main page", to: page_path(@conn, :index), class: "btn btn-link" %></span>
