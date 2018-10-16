@@ -15,7 +15,7 @@ defmodule FileSurrenderWeb.EntryController do
       conn
       |> put_flash(:error, "Unauthorized access detected. Please Authorize.")
       |> configure_session(drop: true)
-      |> redirect(to: "/auth")
+      |> redirect(to: "/")
     end
 
   end

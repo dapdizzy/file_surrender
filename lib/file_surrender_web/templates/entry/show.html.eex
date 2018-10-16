@@ -19,5 +19,5 @@
 
 </ul>
 
-<span><%= link "Edit", to: entry_path(@conn, :edit, @entry) %></span>
-<span><%= link "Back", to: entry_path(@conn, :index) %></span>
+<span><%= link "Edit", to: entry_path(@conn, :edit, @entry), class: "btn btn-link" %></span>
+<span><%= link "List entries", to: entry_path(@conn, :index), class: "btn btn-link" %></span>
