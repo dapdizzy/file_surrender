@@ -34,7 +34,7 @@ config :ueberauth, Ueberauth,
   providers: [
     google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]},
     facebook: {Ueberauth.Strategy.Facebook, [default_scope: "email,public_profile", display: "popup"]},
-    vk: {Ueberauth.Strategy.VK, []}
+    vk: {Ueberauth.Strategy.VK, [profile_fields: "photo_200,location,online"]}
   ]
 
 config :ueberauth, Ueberauth.Strategy.Google.OAuth,
