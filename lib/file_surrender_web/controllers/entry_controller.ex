@@ -32,7 +32,7 @@ defmodule FileSurrenderWeb.EntryController do
   def create(conn, %{"entry" => entry_params}) do
     user = Guardian.Plug.current_resource(conn)
     IO.puts "entry_params: #{inspect entry_params}"
-    case Secure.create_entry(entry_params |> Map.put("uid", user.id) |> Map.put("id", 1)) do
+    case Secure.create_entry(entry_params |> Map.put("uid", user.id)) do # |> Map.put("id", 1)
       {:ok, entry} ->
         conn
         |> put_flash(:info, "Entry created successfully.")

@@ -2,4 +2,4 @@
 
 <%= render "form.html", Map.put(assigns, :action, entry_path(@conn, :create)) %>
 
-<span><%= link "Back", to: entry_path(@conn, :index) %></span>
+<span><%= link "List entries", to: entry_path(@conn, :index), class: "btn btn-link" %></span>
