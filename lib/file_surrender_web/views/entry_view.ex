@@ -3,11 +3,6 @@ defmodule FileSurrenderWeb.EntryView do
 
   require Logger
 
-  def decrypt_value(_uid, secret) do
-    Logger.debug "Old-fashioned value detected, no decryption in view needed."
-    secret
-  end
-
   def decrypt_value(uid, "$V2$_" <> _secret = secret) do
     Logger.debug "decrypting V2 value in view"
     user = UsersCache.lookup(uid)
@@ -18,5 +13,10 @@ defmodule FileSurrenderWeb.EntryView do
       end
     import Encryption.Utils
     decrypt(key, secret) <> " (V2 value)" # TODO: remove after testing
+  end
+
+  def decrypt_value(_uid, secret) do
+    Logger.debug "Old-fashioned value detected, no decryption in view needed."
+    secret
   end
 end
