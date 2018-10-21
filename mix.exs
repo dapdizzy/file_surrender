@@ -52,7 +52,8 @@ defmodule FileSurrender.Mixfile do
       # {:argon2_elixir, "~> 1.3", runtime: false}
       {:guardian, "~> 1.0"},
       {:httpoison, "~> 1.3"},
-      {:hashids, "~> 2.0"}
+      {:hashids, "~> 2.0"},
+      {:encryption_samples, github: "dapdizzy/encryption_samples"}
     ]
   end
 

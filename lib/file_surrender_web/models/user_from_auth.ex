@@ -5,7 +5,8 @@ defmodule UserFromAuth do
   alias Ueberauth.Auth
 
   def find_or_create(%Auth{} = auth) do
-    {:ok, basic_info(auth)}
+    basic_info = basic_info(auth)
+    {:ok, basic_info |> Map.put(:key_hash, gen_key(basic_info))}
   end
 
   # github does it this way
@@ -45,5 +46,12 @@ defmodule UserFromAuth do
         true -> Enum.join(name, " ")
       end
     end
+  end
+
+  import Encryption.Utils
+
+  defp gen_key(info) do
+    %{key_hash: key_hash} = generate_key_hash(info.id)
+    key_hash
   end
 end

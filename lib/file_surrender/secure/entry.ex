@@ -18,10 +18,25 @@ defmodule FileSurrender.Secure.Entry do
   @doc false
   def changeset(entry, attrs) do
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
-    entry
-    |> cast(attrs, [:uid, :name, :secret])
-    |> validate_required([:uid, :name, :secret])
-    # |> prepare_fields
+    cs =
+      entry
+      |> cast(attrs, [:uid, :name, :secret])
+      |> validate_required([:uid, :name, :secret])
+    case cs do
+      %Ecto.Changeset{valid?: true, changes: %{uid: uid, secret: secret}} ->
+        user = UsersCache.lookup(uid)
+        key =
+          case user do
+            %{key_hash: key_hash} when key_hash |> is_binary ->
+              key_hash
+            _ -> raise "user with uid [#{uid}] does not have a valid key_hash. user raw: [#{inspect user}]"
+          end
+        import Encryption.Utils
+        Logger.debug "Detected a valid changeset"
+        Logger.debug "Going to encrypt the raw value of secret: #{inspect secret}"
+        cs |> put_change(:secret, "$V2$_" <> encrypt(key, secret))
+      _ -> cs
+    end
   end
 
   defp prepare_fields(changeset) do
