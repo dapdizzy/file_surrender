@@ -14,7 +14,7 @@ defmodule FileSurrenderWeb.AuthController do
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "You've been logged out!")
-    |> Guardian.Plug.sign_out(FileSurrender.Guardian)
+    |> Guardian.Plug.sign_out(FileSurrender.Guardian, [])
     |> configure_session(drop: true)
     |> redirect(to: "/")
   end
