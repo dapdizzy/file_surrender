@@ -6,7 +6,6 @@ defmodule FileSurrenderWeb.AuthController do
   require Logger
 
   alias Ueberauth.Strategy.Helpers
-  alias FileSurrender.Guardian
 
   def request(conn, _params) do
     text conn, "How did you even get there?!!!"
@@ -15,7 +14,7 @@ defmodule FileSurrenderWeb.AuthController do
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "You've been logged out!")
-    |> Guardian.Plug.sign_out(Guardian)
+    |> Guardian.Plug.sign_out(FileSurrender.Guardian)
     |> configure_session(drop: true)
     |> redirect(to: "/")
   end
@@ -31,6 +30,7 @@ defmodule FileSurrenderWeb.AuthController do
     Logger.debug "auth: #{inspect auth}"
     case UserFromAuth.find_or_create(auth) do
       {:ok, user} ->
+        Logger.debug("user arrived: #{inspect user}")
         conn
         |> put_flash(:info, "Successfully authenticated.")
         # |> put_session(:current_user, user)
