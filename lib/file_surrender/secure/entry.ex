@@ -27,6 +27,7 @@ defmodule FileSurrender.Secure.Entry do
       |> validate_required([:user_id, :name, :secret])
     case cs do
       %Ecto.Changeset{valid?: true, changes: %{user_id: user_id, secret: secret}} ->
+        Logger.debug("Valid entry changeset with update")
         user = UsersCache.lookup(user_id)
         key =
           case user do
@@ -38,7 +39,9 @@ defmodule FileSurrender.Secure.Entry do
         Logger.debug "Detected a valid changeset"
         Logger.debug "Going to encrypt the raw value of secret: #{inspect secret}"
         cs |> put_change(:secret, "$V2$_" <> encrypt(user.id |> decrypt_key_hash(key), secret))
-      _ -> cs
+      _ ->
+        Logger.debug("Not valid changeset")
+        cs
     end
   end
 
