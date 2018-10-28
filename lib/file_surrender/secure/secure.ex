@@ -112,7 +112,7 @@ defmodule FileSurrender.Secure do
   """
   def update_entry(%Entry{} = entry, attrs) do
     entry
-    |> Entry.changeset(attrs)
+    |> Entry.changeset(attrs, true)
     |> Repo.update()
   end
 
