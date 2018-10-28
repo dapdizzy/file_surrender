@@ -49,11 +49,13 @@ defmodule FileSurrender.Secure.Entry do
       |> validate_required([:user_id, :name, :secret])
   end
 
-  def decrypt_entry(%Entry{secret: secret, user_id: user_id} = entry) do
+  def decrypt_entry(%Entry{secret: "$V2$_" <> secret, user_id: user_id} = entry) do
     %{id: id, key_hash: key_hash} = UsersCache.lookup(user_id)
     import Encryption.Utils
     %{entry|secret: decrypt_key_hash(id, key_hash) |> decrypt(secret)}
   end
+
+  def decrypt_entry(%Entry{} = entry), do: entry
 
   defp prepare_fields(changeset) do
     Logger.debug "In prepare_fields, changeset: #{inspect changeset}"
