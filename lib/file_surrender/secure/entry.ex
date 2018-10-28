@@ -4,6 +4,7 @@ defmodule FileSurrender.Secure.Entry do
 
   alias Encryption.EncryptedField
   alias FileSurrender.Secure.User
+  alias FileSurrender.Secure.Entry
 
   require Logger
 
@@ -18,7 +19,7 @@ defmodule FileSurrender.Secure.Entry do
   end
 
   @doc false
-  def changeset(entry, attrs) do
+  def changeset(entry, attrs, true) do
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
     cs =
       entry
@@ -39,6 +40,19 @@ defmodule FileSurrender.Secure.Entry do
         cs |> put_change(:secret, "$V2$_" <> encrypt(user.id |> decrypt_key_hash(key), secret))
       _ -> cs
     end
+  end
+
+  def changeset(entry, attrs, false) do
+    Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
+    entry
+      |> cast(attrs, [:user_id, :name, :secret])
+      |> validate_required([:user_id, :name, :secret])
+  end
+
+  def decrypt_entry(%Entry{secret: secret, user_id: user_id} = entry) do
+    %{id: id, key_hash: key_hash} = UsersCache.lookup(user_id)
+    import Encryption.Utils
+    %{entry|secret: decrypt_key_hash(id, key_hash) |> decrypt(secret)}
   end
 
   defp prepare_fields(changeset) do

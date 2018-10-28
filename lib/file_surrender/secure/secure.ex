@@ -142,7 +142,7 @@ defmodule FileSurrender.Secure do
 
   """
   def change_entry(%Entry{} = entry) do
-    Entry.changeset(entry, %{})
+    Entry.changeset(entry, %{}, false)
   end
 
   alias FileSurrender.Secure.User

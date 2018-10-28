@@ -60,7 +60,7 @@ defmodule FileSurrenderWeb.EntryController do
   end
 
   def edit(conn, %{"id" => id}) do
-    entry = Secure.get_entry!(id)
+    entry = Secure.get_entry!(id) |> Encry.decrypt_entry
     changeset = Secure.change_entry(entry)
     render(conn, "edit.html", entry: entry, changeset: changeset)
   end
