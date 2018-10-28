@@ -12,7 +12,7 @@ defmodule FileSurrenderWeb.EntryView do
         _ -> raise "user with uid [#{user.uid}] does not have a valid key_hash field. Raw user is [#{inspect user}]"
       end
     import Encryption.Utils
-    decrypt(key, secret) <> " (V2 value)" # TODO: remove after testing
+    decrypt(key |> Base.encode64, secret) <> " (V2 value)" # TODO: remove after testing
   end
 
   def decrypt_value(_uid, secret) do

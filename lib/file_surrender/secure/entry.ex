@@ -36,7 +36,7 @@ defmodule FileSurrender.Secure.Entry do
         import Encryption.Utils
         Logger.debug "Detected a valid changeset"
         Logger.debug "Going to encrypt the raw value of secret: #{inspect secret}"
-        cs |> put_change(:secret, "$V2$_" <> encrypt(key, secret))
+        cs |> put_change(:secret, "$V2$_" <> encrypt(key |> Base.encode64, secret))
       _ -> cs
     end
   end
