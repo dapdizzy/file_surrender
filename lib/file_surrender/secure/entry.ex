@@ -41,6 +41,7 @@ defmodule FileSurrender.Secure.Entry do
         cs |> put_change(:secret, "$V2$_" <> encrypt(user.id |> decrypt_key_hash(key), secret))
       _ ->
         Logger.debug("Not valid changeset")
+        Logger.debug("#{inspect cs}")
         cs
     end
   end
