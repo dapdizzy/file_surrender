@@ -21,7 +21,7 @@ defmodule Encryption.EncryptedField do
   end
 
   def load("$V2$_" <> _value = value) do
-    Logger.debug "V2 type value detected. No loading transformation is required thus."
+    Logger.debug "V2 type value detected. No loading transformation is required, it will be later done in the view."
     {:ok, value}
   end
 

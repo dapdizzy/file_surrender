@@ -3,6 +3,7 @@ defmodule FileSurrender.Secure.Entry do
   import Ecto.Changeset
 
   alias Encryption.EncryptedField
+  alias FileSurrender.Secure.User
 
   require Logger
 
@@ -11,6 +12,7 @@ defmodule FileSurrender.Secure.Entry do
     field :name, :binary
     field :secret, EncryptedField
     field :uid, :binary
+    belongs_to :user, User
 
     timestamps()
   end
@@ -20,16 +22,16 @@ defmodule FileSurrender.Secure.Entry do
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
     cs =
       entry
-      |> cast(attrs, [:uid, :name, :secret])
-      |> validate_required([:uid, :name, :secret])
+      |> cast(attrs, [:user_id, :name, :secret])
+      |> validate_required([:user_id, :name, :secret])
     case cs do
-      %Ecto.Changeset{valid?: true, changes: %{uid: uid, secret: secret}} ->
-        user = UsersCache.lookup(uid)
+      %Ecto.Changeset{valid?: true, changes: %{user_id: user_id, secret: secret}} ->
+        user = UsersCache.lookup(user_id)
         key =
           case user do
             %{key_hash: key_hash} when key_hash |> is_binary ->
               key_hash
-            _ -> raise "user with uid [#{uid}] does not have a valid key_hash. user raw: [#{inspect user}]"
+            _ -> raise "user with uid [#{user.id}] does not have a valid key_hash. user raw: [#{inspect user}]"
           end
         import Encryption.Utils
         Logger.debug "Detected a valid changeset"

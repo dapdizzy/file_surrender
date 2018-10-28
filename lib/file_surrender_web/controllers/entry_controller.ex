@@ -9,7 +9,19 @@ defmodule FileSurrenderWeb.EntryController do
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
     if user do
-      entries = Secure.list_entries(user.id)
+      entries =
+        case Secure.list_entries_by_id(user.internal_id) do
+          [] ->
+            if Secure.has_entries_by_uid(user.id) do
+              # Perform the update procedure rewiring from user.id (uid) to user.internal_id
+              Secure.rewire_entries(user.id, user.internal_id)
+              Secure.list_entries_by_id(user.internal_id) # Should return proper list now.
+            else
+              []
+            end
+          list when list |> is_list() ->
+            list
+        end
       render(conn, "index.html", entries: entries)
     else
       conn
@@ -32,7 +44,7 @@ defmodule FileSurrenderWeb.EntryController do
   def create(conn, %{"entry" => entry_params}) do
     user = Guardian.Plug.current_resource(conn)
     IO.puts "entry_params: #{inspect entry_params}"
-    case Secure.create_entry(entry_params |> Map.put("uid", user.id)) do # |> Map.put("id", 1)
+    case Secure.create_entry(entry_params |> Map.put("user_id", user.internal_id)) do # |> Map.put("id", 1)
       {:ok, entry} ->
         conn
         |> put_flash(:info, "Entry created successfully.")

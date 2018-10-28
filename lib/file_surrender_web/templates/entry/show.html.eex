@@ -14,7 +14,7 @@
 
   <li>
     <strong>Secret:</strong>
-    <%= decrypt_value(@entry.uid, @entry.secret) %>
+    <%= decrypt_value(@entry.user_id, @entry.secret) %>
   </li>
 
 </ul>

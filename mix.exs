@@ -50,6 +50,7 @@ defmodule FileSurrender.Mixfile do
       {:ueberauth_facebook, "~> 0.7"},
       {:ueberauth_vk, "~> 0.3"},
       # {:argon2_elixir, "~> 1.3", runtime: false}
+      {:argon2_elixir, "~> 1.3"},
       {:guardian, "~> 1.0"},
       {:httpoison, "~> 1.3"},
       {:hashids, "~> 2.0"},

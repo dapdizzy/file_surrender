@@ -6,6 +6,7 @@ defmodule FileSurrenderWeb.AuthController do
   require Logger
 
   alias Ueberauth.Strategy.Helpers
+  alias FileSurrender.Guardian
 
   def request(conn, _params) do
     text conn, "How did you even get there?!!!"
@@ -14,11 +15,12 @@ defmodule FileSurrenderWeb.AuthController do
   def delete(conn, _params) do
     conn
     |> put_flash(:info, "You've been logged out!")
+    |> Guardian.Plug.sign_out(Guardian)
     |> configure_session(drop: true)
     |> redirect(to: "/")
   end
 
-  def callback(%{assigns: %{ueberauth_failure: _failrure} = assigns} = conn, _params) do
+  def callback(%{assigns: %{ueberauth_failure: _failure} = assigns} = conn, _params) do
     Logger.debug("ueberauth failure. Assigns: #{inspect assigns}")
     conn
     |> put_flash(:error, "Failed to log in.")

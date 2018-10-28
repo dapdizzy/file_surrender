@@ -3,10 +3,38 @@ defmodule UserFromAuth do
   require Poison
 
   alias Ueberauth.Auth
+  alias FileSurrender.Secure
+  alias FileSurrender.Secure.User
 
   def find_or_create(%Auth{} = auth) do
-    basic_info = basic_info(auth)
-    {:ok, basic_info |> Map.put(:key_hash, gen_key(basic_info))}
+    basic_info = basic_info(auth) |> add_hashed_id
+    %User{id: id, key_hash: key_hash} = get_user_by_hash(basic_info)
+    {:ok, basic_info |> Map.put(:key_hash, key_hash) |> Map.put(:internal_id, id)}
+  end
+
+  defp get_user_by_hash(%{hashed_id: hashed_id} = basic_info) do
+    case Secure.get_user_by_uid_hash(hashed_id) do
+      %User{} = u -> u
+      nil -> create_new_user(basic_info)
+    end
+  end
+
+  defp create_new_user(%{hashed_id: hashed_id} = basic_info) do
+    gen_key_hash = gen_key_hash(basic_info)
+    Secure.create_user(%{uid_hash: hashed_id, key_hash: gen_key_hash})
+  end
+
+  defp add_hashed_id(%{id: id} = info) do
+    info |> Map.put(:hashed_id, hash(id))
+  end
+
+  defp get_salt() do
+    System.get_env("salt64") |> Base.decode64!
+  end
+
+  defp hash(value) do
+    salt = get_salt()
+    Argon2.Base.hash_password(value, salt, argon2_type: 1, format: :raw_hash)
   end
 
   # github does it this way
@@ -50,7 +78,7 @@ defmodule UserFromAuth do
 
   import Encryption.Utils
 
-  defp gen_key(info) do
+  defp gen_key_hash(info) do
     %{key_hash: key_hash} = generate_key_hash(info.id)
     key_hash
   end
