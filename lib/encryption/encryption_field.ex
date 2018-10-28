@@ -22,6 +22,11 @@ defmodule Encryption.EncryptedField do
 
   def load("$V2$_" <> _value = value) do
     Logger.debug "V2 type value detected. No loading transformation is required, it will be later done in the view."
+    # decrypt(user.id |> decrypt_key_hash(key), secret)
+    {:ok, value}
+  end
+
+  def load("Secret" <> _tail = value) do
     {:ok, value}
   end
 
