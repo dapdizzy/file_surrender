@@ -94,7 +94,7 @@ defmodule FileSurrender.Secure do
     Logger.debug("Secure.create_entry, attrs: #{inspect attrs}")
     %Entry{}
     # {id: 1, inserted_at: DateTime.utc_now, updated_at: DateTime.utc_now}
-    |> Entry.changeset(attrs)
+    |> Entry.changeset(attrs, true)
     |> Repo.insert()
   end
 
