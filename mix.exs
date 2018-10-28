@@ -54,7 +54,8 @@ defmodule FileSurrender.Mixfile do
       {:guardian, "~> 1.0"},
       {:httpoison, "~> 1.3"},
       {:hashids, "~> 2.0"},
-
+      {:ex_crypto, "~> 0.9.0"},
+      {:key_generator, github: "scrogson/key_generator"}
       # {:encryption_samples, github: "dapdizzy/encryption_samples"}
     ]
   end
