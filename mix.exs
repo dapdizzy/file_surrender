@@ -54,6 +54,7 @@ defmodule FileSurrender.Mixfile do
       {:guardian, "~> 1.0"},
       {:httpoison, "~> 1.3"},
       {:hashids, "~> 2.0"},
+      
       {:encryption_samples, github: "dapdizzy/encryption_samples"}
     ]
   end
