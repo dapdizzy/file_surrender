@@ -26,9 +26,9 @@ defmodule FileSurrender.Secure.Entry do
       |> cast(attrs, [:user_id, :name, :secret])
       |> validate_required([:user_id, :name, :secret])
     case cs do
-      %Ecto.Changeset{valid?: true, changes: %{user_id: user_id, secret: secret}} ->
+      %Ecto.Changeset{valid?: true, changes: %{secret: secret}} ->
         Logger.debug("Valid entry changeset with update")
-        user = UsersCache.lookup(user_id)
+        user = UsersCache.lookup(entry.user_id)
         key =
           case user do
             %{key_hash: key_hash} when key_hash |> is_binary ->
