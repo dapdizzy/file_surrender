@@ -26,7 +26,7 @@ defmodule Encryption.EncryptedField do
     {:ok, value}
   end
 
-  def load("Secret" <> _tail = value) do
+  def load("Editing" <> _tail = value) do
     {:ok, value}
   end
 
