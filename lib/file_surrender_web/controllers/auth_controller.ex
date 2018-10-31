@@ -5,8 +5,6 @@ defmodule FileSurrenderWeb.AuthController do
 
   require Logger
 
-  alias Ueberauth.Strategy.Helpers
-
   def request(conn, _params) do
     text conn, "How did you even get there?!!!"
   end
@@ -26,7 +24,7 @@ defmodule FileSurrenderWeb.AuthController do
     |> redirect(to: "/")
   end
 
-  def callback(%{assigns: %{ueberauth_auth: auth}} = conn, params) do
+  def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     Logger.debug "auth: #{inspect auth}"
     case UserFromAuth.find_or_create(auth) do
       {:ok, user} ->

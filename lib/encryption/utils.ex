@@ -108,4 +108,12 @@ defmodule Encryption.Utils do
   def encrypt(key, data)do
     encrypt(%{key: key, payload: data})
   end
+
+  def decrypt(pwd, hashed_key, data) do
+    decrypt(pwd |> decrypt_key_hash(hashed_key), data)
+  end
+
+  def encrypt(pwd, hashed_key, data) do
+    encrypt(pwd |> decrypt_key_hash(hashed_key), data)
+  end
 end

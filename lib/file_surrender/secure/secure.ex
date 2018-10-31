@@ -79,6 +79,11 @@ defmodule FileSurrender.Secure do
   def get_entry!(id), do: Repo.get!(Entry, id)
 
   @doc """
+  Gets the entry by id in a safe way, i.e., does not raise when entry is not found.
+  """
+  def get_entry(id), do: Repo.get(Entry, id)
+
+  @doc """
   Creates a entry.
 
   ## Examples
@@ -93,7 +98,6 @@ defmodule FileSurrender.Secure do
   def create_entry(attrs \\ %{}) do
     Logger.debug("Secure.create_entry, attrs: #{inspect attrs}")
     %Entry{}
-    # {id: 1, inserted_at: DateTime.utc_now, updated_at: DateTime.utc_now}
     |> Entry.changeset(attrs, true)
     |> Repo.insert()
   end

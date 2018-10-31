@@ -17,4 +17,11 @@ defmodule UsersCache do
   def lookup(user_id) do
     UsersCache |> Agent.get(fn map -> map[user_id] end)
   end
+
+  def get!(user_id) do
+    case lookup(user_id) do
+      %{} = user -> user
+      nil -> raise "User with user_id [#{user_id}] is not found in UsersCache."
+    end
+  end
 end

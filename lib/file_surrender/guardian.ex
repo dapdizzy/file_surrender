@@ -9,7 +9,7 @@ defmodule FileSurrender.Guardian do
 
   def resource_from_claims(claims) do
     id = claims["sub"]
-    user = UsersCache.lookup(id)
+    user = UsersCache.get!(id)
     {:ok, user}
   end
 end

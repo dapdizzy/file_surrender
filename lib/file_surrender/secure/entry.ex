@@ -21,31 +21,13 @@ defmodule FileSurrender.Secure.Entry do
   @doc false
   def changeset(entry, attrs, true) do
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
-    cs =
-      entry
+    entry
       |> cast(attrs, [:user_id, :name, :secret])
       |> validate_required([:user_id, :name, :secret])
-    case cs do
-      %Ecto.Changeset{valid?: true, changes: %{secret: secret} = changes} ->
-        Logger.debug("Valid entry changeset with update")
-        user = UsersCache.lookup(entry.user_id || changes.user_id)
-        key =
-          case user do
-            %{key_hash: key_hash} when key_hash |> is_binary ->
-              key_hash
-            _ -> raise "user with uid [#{user.id}] does not have a valid key_hash. user raw: [#{inspect user}]"
-          end
-        import Encryption.Utils
-        Logger.debug "Detected a valid changeset"
-        Logger.debug "Going to encrypt the raw value of secret: #{inspect secret}"
-        cs |> put_change(:secret, "$V2$_" <> encrypt(user.id |> decrypt_key_hash(key), secret))
-      _ ->
-        Logger.debug("Not valid changeset")
-        Logger.debug("#{inspect cs}")
-        cs
-    end
+      |> encrypt_changeset(entry.user_id)
   end
 
+  # A clause not intended for update, rather for new entry creation in a form.
   def changeset(entry, attrs, false) do
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
     entry
@@ -53,12 +35,35 @@ defmodule FileSurrender.Secure.Entry do
       |> validate_required([:user_id, :name, :secret])
   end
 
-  def decrypt_entry(%Entry{secret: "$V2$_" <> secret, user_id: user_id} = entry) do
-    %{id: id, key_hash: key_hash} = UsersCache.lookup(user_id)
+  # Consider if it is a valid changeset holding a secret field change.
+  defp encrypt_changeset(%Ecto.Changeset{valid?: true, changes: %{secret: secret} = changes} = cs, user_id) do
+    Logger.debug("Valid entry changeset with secret update")
+    {uid, key} =
+      case UsersCache.get!(user_id || changes.user_id) do
+        %{id: id, key_hash: key_hash} -> {id, key_hash}
+        weird_user -> raise "Weird user returned from cache: [#{inspect weird_user}]"
+      end
     import Encryption.Utils
-    %{entry|secret: decrypt_key_hash(id, key_hash) |> decrypt(secret)}
+    Logger.debug "Going to encrypt the raw value of secret: #{inspect secret}"
+    cs |> put_change(:secret, "$V2$_" <> encrypt(uid, key, secret))
   end
 
+  # Passthrough in any other case.
+  defp encrypt_changeset(%Ecto.Changeset{} = changeset, _user_id) do
+    Logger.debug("encrypt_changeset: Passing through changeset")
+    changeset
+  end
+
+  @doc """
+  Decrypts entry's secret value.
+  """
+  def decrypt_entry(%Entry{secret: "$V2$_" <> secret, user_id: user_id} = entry) do
+    %{id: id, key_hash: key_hash} = UsersCache.get!(user_id)
+    import Encryption.Utils
+    %{entry|secret: decrypt(id, key_hash, secret)}
+  end
+
+  # Passthrough if the entry's secret is not of V2 pattern
   def decrypt_entry(%Entry{} = entry), do: entry
 
   defp prepare_fields(changeset) do
