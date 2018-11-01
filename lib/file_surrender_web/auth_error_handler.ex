@@ -17,7 +17,13 @@ defmodule FileSurrender.AuthErrorHandler do
     "Please authorize using either Google, Facebook or VK"
   end
 
-  defp error_message(type, reason) do
-    "Authentication error of type #{type}, reason: #{reason}"
+  defp error_message(_type, _reason) do
+    "We kindly ask you to reauthorize."
   end
+
+  # Hide the type and reason from user for now.
+
+  # defp error_message(type, reason) do
+  #   "Authentication error of type #{type}, reason: #{reason}"
+  # end
 end

@@ -9,7 +9,9 @@ defmodule FileSurrender.Guardian do
 
   def resource_from_claims(claims) do
     id = claims["sub"]
-    user = UsersCache.get!(id)
-    {:ok, user}
+    case UsersCache.lookup(id) do
+      %{} = user -> {:ok, user}
+      nil -> {:error, :user_id_not_found_in_cache}
+    end
   end
 end
