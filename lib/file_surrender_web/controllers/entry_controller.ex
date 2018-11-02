@@ -27,12 +27,12 @@ defmodule FileSurrenderWeb.EntryController do
         end
       render(conn, "index.html", entries: entries)
     else
+      Logger.debug("Got nil user from Guardian for secure/entries index action.")
       conn
-      |> put_flash(:error, "Unauthorized access detected. Please Authorize.")
       |> configure_session(drop: true)
+      |> put_flash(:error, "Unauthorized access detected. Please Authorize.")
       |> redirect(to: "/")
     end
-
   end
 
   def new(conn, _params) do
