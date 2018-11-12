@@ -65,29 +65,51 @@
     <%= if @action_required do %>
       <p class="alert alert-danger" role="alert">Action required!</p>
     <% end %>
+    <%= if @secret_needed do %>
+      <p class="alert alert-danger" role="alert">Secret entry required...</p>
+    <% end %>
     <span><%= link "Secret", to: entry_path(@conn, :index), class: "btn btn-link" %></span>
   <% else %>
-    <a class="btn btn-primary btn-lg" href="/auth/google">
+    <!-- <a class="btn btn-primary btn-lg" href="/auth/google">
       <i class="fa fa-google"></i>
       Sign in with Google
-    </a>
-    <a class="btn btn-primary btn-lg" href="/auth/facebook">
-      <i class="fa fa-facebook"></i>
+    </a> -->
+    <div class="btn white darken-4 col s10 m4">
+      <a href="/auth/google" style="text-transform:none" class="btn btn_primary btn-Lg">
+        <div class="left">
+          <img width="20px" alt="Google &quot;G&quot; Logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"/>
+        </div>
+        Login with Google
+      </a>
+    </div>
+    <a class="loginBtn loginBtn--facebook" href="/auth/facebook">
+      <!-- btn btn-primary btn-lg  -->
+      <!-- <i class="fa fa-facebook"></i> -->
       Sign in with Facebook
     </a>
     <!-- <div class="fb-login-button" data-width="28" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div> -->
     <!-- VK Widget -->
-    <!-- <div id="vk_auth"></div>
+    <!-- <div id="vk_auth">
+      <a class="btn btn-primary btn-lg" href="/auth/vk">
+        <i class="fa fa-google"></i>
+        Sign in with VK
+      </a>
+    </div>
     <script type="text/javascript">
       VK.Widgets.Auth("vk_auth", {"authUrl":"/auth/vk/callback"});
     </script> -->
-    <a class="btn btn-primary btn-lg" href="/auth/vk">
-      <i class="fa fa-google"></i>
+    <a class="btn-lg btn-social btn-vk" href="/auth/vk">
+      <i class="fa fa-vk"></i>
       Sign in with VK
     </a>
     <!-- <% vk_client_id = System.get_env("VK_CLIENT_ID") %> -->
     <!-- <% vk_client_secret = System.get_env("VK_CLIENT_SECRET") %> -->
     <!-- <button onclick="location.href='https://oauth.vk.com/authorize?client_id=<?= vk_client_id %>&display=page&redirect_uri=https://file-surrender.herokuapp.com/auth/vk/callback?scope=friends&response_type=code&v=5.85;">Войти через VK</button> -->
+    <br>
+    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+    <!-- <span class="sr-only">Loading...</span> -->
   <% end %>
 
   <!-- <div class="col-lg-6">

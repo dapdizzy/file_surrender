@@ -7,8 +7,8 @@ use Mix.Config
 # watchers to your application. For example, we use it
 # with brunch.io to recompile .js and .css sources.
 config :file_surrender, FileSurrenderWeb.Endpoint,
-  http: [port: 4001],
-  https: [port: 4002, keyfile: "priv/server.key", certfile: "priv/server.pfx"],
+  http: [port: 4008],
+  # https: [port: 4002, keyfile: "priv/server.key", certfile: "priv/server.pfx"],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

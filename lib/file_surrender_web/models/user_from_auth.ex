@@ -5,12 +5,21 @@ defmodule UserFromAuth do
   alias Ueberauth.Auth
   alias FileSurrender.Secure
   alias FileSurrender.Secure.User
+  alias FileSurrender.Secure.Secret
 
   def find_or_create(%Auth{} = auth) do
     basic_info = basic_info(auth) |> add_hashed_id
-    %User{id: id, key_hash: key_hash} = get_user_by_hash(basic_info)
-    {:ok, basic_info |> Map.put(:key_hash, key_hash) |> Map.put(:internal_id, id)}
+    %User{id: id, key_hash: key_hash, secret: secret} = get_user_by_hash(basic_info)
+    {:ok, basic_info |> Map.put(:key_hash, key_hash) |> Map.put(:internal_id, id) |> Map.put(:secret, secret)}
   end
+
+  # TODO: after thinking for a while, it looks more convenient to store the whole secret struct in the user map, so extract_secret fucntion clauses are now left hanging unused for a while...
+
+  defp extract_secret(%Secret{secret: secret}) do
+    secret
+  end
+
+  defp extract_secret(nil), do: nil
 
   defp get_user_by_hash(%{hashed_id: hashed_id} = basic_info) do
     case Secure.get_user_by_uid_hash(hashed_id) do

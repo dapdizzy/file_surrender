@@ -12,24 +12,26 @@ defmodule FileSurrenderWeb.EntryController do
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
     if user do
-      entries =
+      conn =
         case Secure.list_entries_by_id(user.internal_id) do
           [] ->
             if Secure.has_entries_by_uid(user.id) do
               # Perform the update procedure rewiring from user.id (uid) to user.internal_id
               Secure.rewire_entries(user.id, user.internal_id)
-              Secure.list_entries_by_id(user.internal_id) # Should return proper list now.
+              entries = Secure.list_entries_by_id(user.internal_id) # Should return proper list now.
+              conn |> assign(:entries, entries) |> put_flash(:info, "Your secure entries have been successfuly rewired to the new schema!")
             else
-              []
+              conn |> assign(:entries, [])
             end
           list when list |> is_list() ->
-            list
+            Logger.debug("Got entries list by user id #{user.internal_id}")
+            conn |> assign(:entries, list)
         end
-      render(conn, "index.html", entries: entries)
+      render(conn, "index.html", entries: conn.assigns.entries)
     else
       Logger.debug("Got nil user from Guardian for secure/entries index action.")
       conn
-      |> configure_session(drop: true)
+      |> configure_session(renew: true)
       |> put_flash(:error, "Unauthorized access detected. Please Authorize.")
       |> redirect(to: "/")
     end
@@ -72,7 +74,7 @@ defmodule FileSurrenderWeb.EntryController do
 
   def update(conn, %{"entry" => entry_params}) do
     # entry = Secure.get_entry!(id)
-    entry = conn.asigns.entry
+    entry = conn.assigns.entry
 
     case Secure.update_entry(entry, entry_params) do
       {:ok, entry} ->

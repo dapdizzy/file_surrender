@@ -184,7 +184,10 @@ defmodule FileSurrender.Secure do
   Gets the user by uid_hash which is a unique key.
   """
   def get_user_by_uid_hash(uid_hash) do
-    Repo.get_by(User, uid_hash: uid_hash)
+    query = (from u in User, where: u.uid_hash == ^uid_hash, preload: [:secret])
+    Repo.one(query)
+    # TODO: need to verify this change.
+    # Repo.get_by(User, uid_hash: uid_hash)
   end
 
   @doc """
@@ -250,5 +253,116 @@ defmodule FileSurrender.Secure do
   """
   def change_user(%User{} = user) do
     User.changeset(user, %{})
+  end
+
+  alias FileSurrender.Secure.Secret
+
+  @doc """
+  Returns the list of secrets.
+
+  ## Examples
+
+      iex> list_secrets()
+      [%Secret{}, ...]
+
+  """
+  def list_secrets do
+    Repo.all(Secret)
+  end
+
+  @doc """
+  Gets a single secret.
+
+  Raises `Ecto.NoResultsError` if the Secret does not exist.
+
+  ## Examples
+
+      iex> get_secret!(123)
+      %Secret{}
+
+      iex> get_secret!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_secret!(id), do: Repo.get!(Secret, id)
+
+  @doc """
+  Gets the Secret by user_id.
+  """
+  def get_user_secret(user_id) do
+    Repo.get_by(Secret, user_id: user_id)
+  end
+
+  @doc """
+  Determines whether the user has personal secret stored.
+  """
+  def has_secret(user_id) do
+    false
+    # TODO: may be the whole function is not needed...
+  end
+
+  @doc """
+  Creates a secret.
+
+  ## Examples
+
+      iex> create_secret(%{field: value})
+      {:ok, %Secret{}}
+
+      iex> create_secret(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_secret(attrs \\ %{}, user_id) do
+    %Secret{user_id: user_id}
+    |> Secret.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a secret.
+
+  ## Examples
+
+      iex> update_secret(secret, %{field: new_value})
+      {:ok, %Secret{}}
+
+      iex> update_secret(secret, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_secret(%Secret{} = secret, attrs) do
+    secret
+    |> Secret.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a Secret.
+
+  ## Examples
+
+      iex> delete_secret(secret)
+      {:ok, %Secret{}}
+
+      iex> delete_secret(secret)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_secret(%Secret{} = secret) do
+    Repo.delete(secret)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking secret changes.
+
+  ## Examples
+
+      iex> change_secret(secret)
+      %Ecto.Changeset{source: %Secret{}}
+
+  """
+  def change_secret(%Secret{} = secret) do
+    Secret.changeset(secret, %{})
   end
 end

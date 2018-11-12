@@ -128,4 +128,64 @@ defmodule FileSurrender.SecureTest do
       assert %Ecto.Changeset{} = Secure.change_user(user)
     end
   end
+
+  describe "secrets" do
+    alias FileSurrender.Secure.Secret
+
+    @valid_attrs %{secret: "some secret"}
+    @update_attrs %{secret: "some updated secret"}
+    @invalid_attrs %{secret: nil}
+
+    def secret_fixture(attrs \\ %{}) do
+      {:ok, secret} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Secure.create_secret()
+
+      secret
+    end
+
+    test "list_secrets/0 returns all secrets" do
+      secret = secret_fixture()
+      assert Secure.list_secrets() == [secret]
+    end
+
+    test "get_secret!/1 returns the secret with given id" do
+      secret = secret_fixture()
+      assert Secure.get_secret!(secret.id) == secret
+    end
+
+    test "create_secret/1 with valid data creates a secret" do
+      assert {:ok, %Secret{} = secret} = Secure.create_secret(@valid_attrs)
+      assert secret.secret == "some secret"
+    end
+
+    test "create_secret/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Secure.create_secret(@invalid_attrs)
+    end
+
+    test "update_secret/2 with valid data updates the secret" do
+      secret = secret_fixture()
+      assert {:ok, secret} = Secure.update_secret(secret, @update_attrs)
+      assert %Secret{} = secret
+      assert secret.secret == "some updated secret"
+    end
+
+    test "update_secret/2 with invalid data returns error changeset" do
+      secret = secret_fixture()
+      assert {:error, %Ecto.Changeset{}} = Secure.update_secret(secret, @invalid_attrs)
+      assert secret == Secure.get_secret!(secret.id)
+    end
+
+    test "delete_secret/1 deletes the secret" do
+      secret = secret_fixture()
+      assert {:ok, %Secret{}} = Secure.delete_secret(secret)
+      assert_raise Ecto.NoResultsError, fn -> Secure.get_secret!(secret.id) end
+    end
+
+    test "change_secret/1 returns a secret changeset" do
+      secret = secret_fixture()
+      assert %Ecto.Changeset{} = Secure.change_secret(secret)
+    end
+  end
 end

@@ -5,6 +5,7 @@ defmodule FileSurrender.Secure.Entry do
   alias Encryption.EncryptedField
   alias FileSurrender.Secure.User
   alias FileSurrender.Secure.Entry
+  alias FileSurrender.Secure.Secret
 
   require Logger
 
@@ -38,20 +39,33 @@ defmodule FileSurrender.Secure.Entry do
   # Consider if it is a valid changeset holding a secret field change.
   defp encrypt_changeset(%Ecto.Changeset{valid?: true, changes: %{secret: secret} = changes} = cs, user_id) do
     Logger.debug("Valid entry changeset with secret update")
-    {uid, key} =
+    {entryption_secret, key, with_secret?} =
       case UsersCache.get!(user_id || changes.user_id) do
-        %{id: id, key_hash: key_hash} -> {id, key_hash}
+        %{id: id, key_hash: key_hash, secret: secret_struct} -> get_encryption_info(id, key_hash, secret_struct)
         weird_user -> raise "Weird user returned from cache: [#{inspect weird_user}]"
       end
     import Encryption.Utils
     Logger.debug "Going to encrypt the raw value of secret: #{inspect secret}"
-    cs |> put_change(:secret, "$V2$_" <> encrypt(uid, key, secret))
+    cs |> put_change(:secret, (if with_secret?, do: "$V3$_", else: "$V2$_") <> encrypt(entryption_secret, key, secret))
   end
 
   # Passthrough in any other case.
   defp encrypt_changeset(%Ecto.Changeset{} = changeset, _user_id) do
     Logger.debug("encrypt_changeset: Passing through changeset")
     changeset
+  end
+
+  defp get_encryption_info(id, key_hash, secret) do
+    case secret do
+      %Secret{verified?: verified, open_secret: open_secret} ->
+        if verified do
+          {open_secret, key_hash, true}
+        else
+          {id, key_hash, false}
+        end
+      nil ->
+        {id, key_hash, false}
+    end
   end
 
   @doc """
@@ -61,6 +75,12 @@ defmodule FileSurrender.Secure.Entry do
     %{id: id, key_hash: key_hash} = UsersCache.get!(user_id)
     import Encryption.Utils
     %{entry|secret: decrypt(id, key_hash, secret)}
+  end
+
+  def decrypt_entry(%Entry{secret: "$V3$_" <> secret, user_id: user_id} = entry) do
+    %{key_hash: key_hash, secret: %Secret{open_secret: encryption_secret, verified?: true}} = UsersCache.get!(user_id)
+    import Encryption.Utils, only: [decrypt: 3]
+    %{entry|secret: decrypt(encryption_secret, key_hash, secret)}
   end
 
   # Passthrough if the entry's secret is not of V2 pattern

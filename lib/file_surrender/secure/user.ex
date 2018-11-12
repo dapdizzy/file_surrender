@@ -1,8 +1,8 @@
 defmodule FileSurrender.Secure.User do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Encryption.HashedField
   alias FileSurrender.Secure.Entry
+  alias FileSurrender.Secure.Secret
 
   # @primary_key {:uid_hash, :string, read_after_writes: true}
 
@@ -10,6 +10,7 @@ defmodule FileSurrender.Secure.User do
     field :uid_hash, :string
     field :key_hash, :string
     has_many :entries, Entry
+    has_one :secret, Secret
 
     timestamps()
   end
