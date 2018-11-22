@@ -18,12 +18,21 @@ defmodule FileSurrender.Secure.Secret do
   end
 
   @doc false
-  def changeset(secret, attrs) do
+  def changeset(secret, attrs, update \\ false) do
+    fields = get_fields(update)
     secret
-    |> cast(attrs, [:open_secret, :new_secret])
-    |> validate_required([:open_secret, :new_secret])
+    |> cast(attrs, fields)
+    |> validate_required(fields)
     |> verify_open_secret()
     |> copy_new_secret()
+  end
+
+  defp get_fields(false) do
+    [:open_secret]
+  end
+
+  defp get_fields(true) do
+    [:open_secret, :new_secret]
   end
 
   defp verify_open_secret(%Ecto.Changeset{valid?: false} = changeset) do

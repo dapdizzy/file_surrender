@@ -333,7 +333,7 @@ defmodule FileSurrender.Secure do
   """
   def update_secret(%Secret{} = secret, attrs) do
     secret
-    |> Secret.changeset(attrs)
+    |> Secret.changeset(attrs, true)
     |> Repo.update()
   end
 
