@@ -8,7 +8,7 @@ defmodule FileSurrenderWeb.SecretController do
 
   plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
   plug :authorize_secret
-  plug :short_circuit_secret, [condition: &Secret.secret_verified/1, message: "Your Secret has already been verified."] when action in [:verify, :verify_prompt]
+  plug :short_circuit_secret, [condition: &Secret.secret_verified?/1, message: "Your Secret has already been verified."] when action in [:verify, :verify_prompt]
   plug :short_circuit_secret, [condition: &Secret.has_secret?/1, message: "You already have your encryption Secret."] when action in [:create, :new]
   plug :short_circuit_secret, [condition: &Secret.has_no_secret?/1, message: "You do not have Secret value yet."] when action in [:edit, :update]
 
