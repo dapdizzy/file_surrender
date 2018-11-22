@@ -65,9 +65,13 @@
     <%= if @action_required do %>
       <p class="alert alert-danger" role="alert">Action required!</p>
     <% end %>
-    <%= if @secret_needed do %>
+    <%= if secret_required? @secret do %>
       <p class="alert alert-danger" role="alert">Secret entry required...</p>
     <% end %>
+    <%= if verification_required? @secret do %>
+      <p class="alert alert-danger" role="alert">Secret verification required</p>
+    <% end %>
+    <span><%= link "Secret passphrase", to: secret_path(@conn, :show), class: "btn btn-link" %></span>
     <span><%= link "Secret", to: entry_path(@conn, :index), class: "btn btn-link" %></span>
   <% else %>
     <!-- <a class="btn btn-primary btn-lg" href="/auth/google">

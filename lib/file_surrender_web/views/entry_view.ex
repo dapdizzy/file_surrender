@@ -2,6 +2,7 @@ defmodule FileSurrenderWeb.EntryView do
   use FileSurrenderWeb, :view
 
   alias Encryption.UserContext
+  alias FileSurrender.Secure.Secret
 
   require Logger
 
@@ -14,7 +15,7 @@ defmodule FileSurrenderWeb.EntryView do
 
   def decrypt_value(user_id, "$V3$_" <> secret = value) do
     Logger.debug("decrypting V3 (secret encrypted) value in view: [#{inspect value}]")
-    %{key_hash: key_hash, secret: %Secret{verified?: true, open_secret: encryption_secret}} = UsersCache.get!get!(user_id)
+    %{key_hash: key_hash, secret: %Secret{verified?: true, open_secret: encryption_secret}} = UsersCache.get!(user_id)
     import Encryption.Utils, only: [decrypt: 3]
     decrypt(encryption_secret, key_hash, secret) <> " (V3 Secret encrypted value)"
   end

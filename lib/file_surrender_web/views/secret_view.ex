@@ -22,6 +22,14 @@ defmodule FileSurrenderWeb.SecretView do
     verified
   end
 
+  def has_secret?(nil) do
+    false
+  end
+
+  def has_secret?(%Secret{secret: secret}) do
+    !empty?(secret)
+  end
+
   defp empty?(nil) do
     true
   end

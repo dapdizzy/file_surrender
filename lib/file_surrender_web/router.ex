@@ -40,6 +40,13 @@ defmodule FileSurrenderWeb.Router do
     pipe_through [:browser, :browser_auth]
 
     resources "/entries", EntryController
+    get "/secret", SecretController, :show
+    get "/secret/create", SecretController, :new
+    post "/secret/create", SecretController, :create
+    get "/secret/edit", SecretController, :edit
+    put "/secret/edit", SecretController, :update
+    get "/secret/verify", SecretController, :verify_prompt
+    post "/secret/verify", SecretController, :verify
   end
 
   # Other scopes may use custom stacks.

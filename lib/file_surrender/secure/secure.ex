@@ -365,4 +365,40 @@ defmodule FileSurrender.Secure do
   def change_secret(%Secret{} = secret) do
     Secret.changeset(secret, %{})
   end
+
+  defp decrypt(secret, key_hash, encryption_secret) do
+    Encryption.Utils.decrypt(encryption_secret, key_hash, secret)
+  end
+
+  defp encrypt(secret, key_hash, encryption_secret) do
+    Encryption.Utils.encrypt(encryption_secret, key_hash, secret)
+  end
+
+  def reencrypt_entries(user_id, key_hash, old_secret, new_secret) do
+    query = from(e in Entry, where: e.user_id == ^user_id)
+    stream = Repo.stream(query)
+    Repo.transaction(fn ->
+      stream
+      |> Stream.map(fn %Entry{secret: secret} = entry ->
+        case secret do
+          "$V3$_" <> secret_part ->
+            updated_secret = "$V3$_" <> (secret_part |> decrypt(key_hash, old_secret) |> encrypt(key_hash, new_secret))
+            Ecto.Changeset.change(entry, secret: updated_secret)
+          _ -> nil
+        end
+      end)
+      |> Stream.filter(fn %Ecto.Changeset{} -> true; nil -> false end)
+      |> Stream.map(fn %Ecto.Changeset{} = changeset ->
+        case Repo.update(changeset) do
+          {:ok, _updated} -> :ok
+          {:error, changeset} -> raise "Something went wrong with the changeset: [#{inspect changeset}]"
+        end
+      end)
+      |> Enum.count
+    end)
+    |> case do
+      {:ok, counter} -> counter
+      {:error, error} -> raise "An error occured inside reencryption transaction: [#{inspect error}]"
+    end
+  end
 end

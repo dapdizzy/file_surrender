@@ -4,6 +4,7 @@ defmodule FileSurrender.Secure.Secret do
   import Encryption.HashedField, only: [verify_secret: 2]
   alias Encryption.HashedField
   alias FileSurrender.Secure.User
+  alias FileSurrender.Secure.Secret
 
   schema "secrets" do
     field :open_secret, :string, virtual: true
@@ -25,7 +26,7 @@ defmodule FileSurrender.Secure.Secret do
     |> copy_new_secret()
   end
 
-  defp verify_open_secret(%Ecto.Changeset{valid? : false} = changeset) do
+  defp verify_open_secret(%Ecto.Changeset{valid?: false} = changeset) do
     changeset
   end
 
@@ -38,11 +39,47 @@ defmodule FileSurrender.Secure.Secret do
     end
   end
 
+  # Passthrough in all the other cases (like if according fields are not present in changes or data is missing, i.e., whatever)
+  defp verify_open_secret(%Ecto.Changeset{} = changeset) do
+    changeset
+  end
+
   defp copy_new_secret(%Ecto.Changeset{valid?: false} = changeset) do
     changeset
   end
 
   defp copy_new_secret(%Ecto.Changeset{valid?: true, changes: %{new_secret: new_secret}} = changeset) do
     changeset |> put_change(:secret, new_secret)
+  end
+
+  defp copy_new_secret(%Ecto.Changeset{} = changeset) do
+    changeset # Passthough in all the other cases.
+  end
+
+  def secret_verified?(nil) do
+    false
+  end
+
+  def secret_verified?(%Secret{verified?: verified}) do
+    verified
+  end
+
+  def has_secret?(boolean, nil) do
+    !boolean
+  end
+
+  def has_secret?(boolean, %Secret{secret: secret}) do
+    has_secret = secret && secret != ""
+    if boolean, do: has_secret, else: !has_secret
+  end
+
+  # Need thowse two due to limitations on the types of values (fucntions in particular) we can use in plugs.
+
+  def has_secret?(secret) do
+    has_secret?(true, secret)
+  end
+
+  def has_no_secret?(secret) do
+    has_secret?(false, secret)
   end
 end

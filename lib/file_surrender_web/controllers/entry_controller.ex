@@ -3,6 +3,7 @@ defmodule FileSurrenderWeb.EntryController do
 
   alias FileSurrender.Secure
   alias FileSurrender.Secure.Entry
+  alias FileSurrender.Secure.Secret
 
   require Logger
 
@@ -27,6 +28,18 @@ defmodule FileSurrenderWeb.EntryController do
             Logger.debug("Got entries list by user id #{user.internal_id}")
             conn |> assign(:entries, list)
         end
+      if conn.assigns.entries
+      |> Enum.any?(fn %Entry{secret: secret} ->
+        case secret do
+          "$V3$_" <> _secret_part -> true
+          _ -> false
+        end
+      end) && unverified_secret?(user.secret, user) do
+        conn
+        |> put_flash(:info, "Please verify your Secret first.")
+        |> redirect(to: secret_path(conn, :verify_prompt))
+        |> halt()
+      end
       render(conn, "index.html", entries: conn.assigns.entries)
     else
       Logger.debug("Got nil user from Guardian for secure/entries index action.")
@@ -35,6 +48,14 @@ defmodule FileSurrenderWeb.EntryController do
       |> put_flash(:error, "Unauthorized access detected. Please Authorize.")
       |> redirect(to: "/")
     end
+  end
+
+  defp unverified_secret?(nil, user) do
+    raise "For some reason there are V3 encrypted values for user [#{inspect user}], but there is nil secret for him..."
+  end
+
+  defp unverified_secret?(%Secret{verified?: verified}, _user) do
+    !verified
   end
 
   def new(conn, _params) do
