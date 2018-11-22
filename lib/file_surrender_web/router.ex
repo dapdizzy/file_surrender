@@ -46,7 +46,7 @@ defmodule FileSurrenderWeb.Router do
     get "/secret/edit", SecretController, :edit
     put "/secret/edit", SecretController, :update
     get "/secret/verify", SecretController, :verify_prompt
-    post "/secret/verify", SecretController, :verify
+    patch "/secret/verify", SecretController, :verify
   end
 
   # Other scopes may use custom stacks.
