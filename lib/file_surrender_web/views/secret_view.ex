@@ -5,8 +5,8 @@ defmodule FileSurrenderWeb.SecretView do
 
   def display_secret(nil), do: "(You do not have Secret value yet)"
 
-  def display_secret(%Secret{secret: secret, open_secret: open_secret}) do
-    unless open_secret |> empty? do
+  def display_secret(%Secret{secret: secret, open_secret: _open_secret, verified?: verified}) do
+    unless verified do
       "(You need to verify your Secret value)"
     else
       s = secret |> String.slice(0, 10)
