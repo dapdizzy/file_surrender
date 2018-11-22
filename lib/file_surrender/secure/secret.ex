@@ -24,6 +24,7 @@ defmodule FileSurrender.Secure.Secret do
     |> cast(attrs, fields)
     |> validate_required(fields)
     |> verify_open_secret()
+    |> copy_open_secret()
     |> copy_new_secret()
   end
 
@@ -39,7 +40,7 @@ defmodule FileSurrender.Secure.Secret do
     changeset
   end
 
-  defp verify_open_secret(%Ecto.Changeset{valid?: true, changes: %{open_secret: open_secret}, data: %Secret{secret: secret}} = changeset) do
+  defp verify_open_secret(%Ecto.Changeset{valid?: true, changes: %{open_secret: open_secret}, data: %Secret{secret: secret}} = changeset) when secret |> is_binary() and secret != "" do
     unless verify_secret(open_secret, secret) do
       changeset
       |> add_error(:open_secret, "The secret value does not match the stored secret.")
@@ -53,11 +54,23 @@ defmodule FileSurrender.Secure.Secret do
     changeset
   end
 
+  defp copy_open_secret(%Ecto.Changeset{valid?: false} = changeset) do
+    changeset
+  end
+
+  defp copy_open_secret(%Ecto.Changeset{valid?: true, changes: %{open_secret: open_secret}} = changeset) when open_secret |> is_binary() and open_secret != "" do
+    changeset |> put_change(:secret, open_secret)
+  end
+
+  defp copy_open_secret(%Ecto.Changeset{} = changeset) do
+    changeset
+  end
+
   defp copy_new_secret(%Ecto.Changeset{valid?: false} = changeset) do
     changeset
   end
 
-  defp copy_new_secret(%Ecto.Changeset{valid?: true, changes: %{new_secret: new_secret}} = changeset) do
+  defp copy_new_secret(%Ecto.Changeset{valid?: true, changes: %{new_secret: new_secret}} = changeset) when new_secret |> is_binary() and new_secret != "" do
     changeset |> put_change(:secret, new_secret)
   end
 

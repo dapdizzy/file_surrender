@@ -19,7 +19,7 @@ defmodule Encryption.HashedField do
   end
 
   def verify_secret(open_secret, secret) do
-    Argon2.verify_hash(open_secret, secret)
+    Argon2.verify_pass(open_secret, secret)
   end
 
   defp get_salt() do
