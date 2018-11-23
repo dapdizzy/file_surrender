@@ -51,7 +51,7 @@ defmodule FileSurrenderWeb.SecretController do
       |> render("verify.html", changeset: Secure.change_secret(secret))
     else
       # This way we can update the secret stored for the user in cache.
-      UsersCache.add(%{user|secret: %{secret|open_secret: open_secret, verified?: true}})
+      UsersCache.add(%{user|secret: Secure.set_secret_key_hash(%{secret|open_secret: open_secret, verified?: true})})
       conn
       |> put_flash(:info, "You have successfuly verified your Secret!")
       |> redirect(to: entry_path(conn, :index))

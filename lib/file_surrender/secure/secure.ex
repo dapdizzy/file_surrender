@@ -337,6 +337,18 @@ defmodule FileSurrender.Secure do
     |> Repo.update()
   end
 
+  def set_secret_key_hash(%Secret{key_hash: key_hash, verified?: true, open_secret: open_secret} = secret)
+  when (key_hash == nil or key_hash == "")
+  and open_secret |> is_binary() and open_secret != ""
+  do
+    Secret.set_key_hash_changeset(secret)
+    |> Repo.update!()
+  end
+
+  def set_secret_key_hash(%Secret{} = secret) do
+    secret
+  end
+
   @doc """
   Deletes a Secret.
 

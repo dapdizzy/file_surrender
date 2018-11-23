@@ -6,11 +6,14 @@ defmodule FileSurrender.Secure.Secret do
   alias FileSurrender.Secure.User
   alias FileSurrender.Secure.Secret
 
+  require Logger
+
   schema "secrets" do
     field :open_secret, :string, virtual: true
     field :new_secret, :string, virtual: true
     field :secret, HashedField, read_after_writes: true
     field :verified?, :boolean, virtual: true, default: false
+    field :key_hash, :string
     # field :user_id, :id
     belongs_to :user, User
 
@@ -26,6 +29,7 @@ defmodule FileSurrender.Secure.Secret do
     |> verify_open_secret()
     |> copy_open_secret()
     |> copy_new_secret()
+    |> set_key_hash()
   end
 
   defp get_fields(false) do
@@ -41,6 +45,18 @@ defmodule FileSurrender.Secure.Secret do
   end
 
   defp verify_open_secret(%Ecto.Changeset{valid?: true, changes: %{open_secret: open_secret}, data: %Secret{secret: secret}} = changeset) when secret |> is_binary() and secret != "" do
+    unless verify_secret(open_secret, secret) do
+      changeset
+      |> add_error(:open_secret, "The secret value does not match the stored secret.")
+    else
+      changeset
+    end
+  end
+
+  defp verify_open_secret(%Ecto.Changeset{valid?: true, changes: changes, data: %Secret{verified?: true, secret: secret, open_secret: open_secret}} = changeset)
+  when secret |> is_binary() and secret != ""
+  and open_secret |> is_binary() and open_secret != ""
+  do
     unless verify_secret(open_secret, secret) do
       changeset
       |> add_error(:open_secret, "The secret value does not match the stored secret.")
@@ -78,6 +94,35 @@ defmodule FileSurrender.Secure.Secret do
     changeset # Passthough in all the other cases.
   end
 
+  def set_key_hash(%Ecto.Changeset{valid?: false} = changeset) do
+    changeset
+  end
+
+  def set_key_hash(%Ecto.Changeset{valid?: true, changes: %{open_secret: open_secret}, data: %Secret{secret: secret}} = changeset) when secret == nil or secret == "" do
+    #  This only works for the case when we create secret, i.e., have open_secret in changes and do not have secret value filled in data struct.
+    key_hash = gen_key_hash(open_secret)
+    changeset |> put_change(:key_hash, key_hash)
+  end
+
+  def set_key_hash(%Ecto.Changeset{valid?: true, changes: changes, data: %Secret{open_secret: open_secret, verified?: true}} = changeset) do
+    if changes |> Map.equal?(%{}) do
+      changeset |> put_change(:key_hash, gen_key_hash(open_secret))
+      Logger.debug("Key_hash has been put to the user's secret!")
+    else
+      changeset
+    end
+  end
+
+  def set_key_hash(%Ecto.Changeset{} = changeset) do
+    changeset
+  end
+
+  def set_key_hash_changeset(secret) do
+    Ecto.Changeset.change(secret, %{})
+    |> verify_open_secret()
+    |> set_key_hash()
+  end
+
   def secret_verified?(nil) do
     false
   end
@@ -103,5 +148,10 @@ defmodule FileSurrender.Secure.Secret do
 
   def has_no_secret?(secret) do
     has_secret?(false, secret)
+  end
+
+  defp gen_key_hash(open_secret) do
+    %{key_hash: key_hash} = Encryption.Utils.generate_key_hash(open_secret)
+    key_hash
   end
 end

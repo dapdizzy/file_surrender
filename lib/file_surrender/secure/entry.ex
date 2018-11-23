@@ -56,14 +56,21 @@ defmodule FileSurrender.Secure.Entry do
   end
 
   defp get_encryption_info(id, key_hash, secret) do
+    Logger.debug("get_encryption_info")
     case secret do
-      %Secret{verified?: verified, open_secret: open_secret} ->
+      %Secret{verified?: verified, open_secret: open_secret, key_hash: secret_key_hash} ->
         if verified do
-          {open_secret, key_hash, true}
+          Logger.debug("verified Secret [#{inspect secret}], open_secret: [#{open_secret}]")
+          if secret_key_hash == nil or secret_key_hash == "" do
+            raise "secret_key_hash is empty!"
+          end
+          {open_secret, secret_key_hash, true}
         else
+          Logger.debug("Non-verified secret")
           {id, key_hash, false}
         end
       nil ->
+        Logger.debug("Nil Secret")
         {id, key_hash, false}
     end
   end
@@ -78,9 +85,12 @@ defmodule FileSurrender.Secure.Entry do
   end
 
   def decrypt_entry(%Entry{secret: "$V3$_" <> secret, user_id: user_id} = entry) do
-    %{key_hash: key_hash, secret: %Secret{open_secret: encryption_secret, verified?: true}} = UsersCache.get!(user_id)
+    %{secret: %Secret{open_secret: encryption_secret, verified?: true, key_hash: secret_key_hash}} = UsersCache.get!(user_id)
+    if secret_key_hash == nil or secret_key_hash == "" do
+      raise "secret_key_hash is empty!"
+    end
     import Encryption.Utils, only: [decrypt: 3]
-    %{entry|secret: decrypt(encryption_secret, key_hash, secret)}
+    %{entry|secret: decrypt(encryption_secret, secret_key_hash, secret)}
   end
 
   # Passthrough if the entry's secret is not of V2 pattern
