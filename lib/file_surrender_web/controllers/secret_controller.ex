@@ -69,14 +69,15 @@ defmodule FileSurrenderWeb.SecretController do
     secret = conn.assigns.secret
 
     case Secure.update_secret(secret, secret_params) do
-      {:ok, %Secret{open_secret: open_secret, new_secret: new_secret}} ->
+      {:ok, %Secret{open_secret: open_secret, new_secret: new_secret} = updated_secret} ->
         # TODO: need to reencrypt all the user's data with the new_secret.
         # Here we are updating (reencrypting) all the user secure entries using updated secret value.
         Logger.debug("Going to reencrypt secure entries with the updated secret key for the user with id: #{user.internal_id}")
         counter = Secure.reencrypt_entries(user.internal_id, user.key_hash, open_secret, new_secret)
         Logger.debug("#{counter} secure entries were reencrypted with the updated security key for user with id: #{user.internal_id}")
+        UsersCache.add(%{user|secret: updated_secret}) # Update secret value in users cache.
         conn
-        |> put_flash(:info, "Your Secret has been successfuly updated!")
+        |> put_flash(:info, "Your Secret has been successfuly updated! (#{counter} entries)")
         |> redirect(to: secret_path(conn, :show))
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", secret: secret, changeset: changeset)
