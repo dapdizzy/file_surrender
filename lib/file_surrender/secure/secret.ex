@@ -13,9 +13,10 @@ defmodule FileSurrender.Secure.Secret do
     field :new_secret, :string, virtual: true
     field :secret, HashedField, read_after_writes: true
     field :verified?, :boolean, virtual: true, default: false
-    field :key_hash, :string
     # field :user_id, :id
     belongs_to :user, User
+
+    field :key_hash, :string
 
     timestamps()
   end
