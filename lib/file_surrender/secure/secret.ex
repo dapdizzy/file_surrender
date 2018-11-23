@@ -118,10 +118,26 @@ defmodule FileSurrender.Secure.Secret do
     changeset
   end
 
+  defp set_key_hash(%Ecto.Changeset{valid?: true, data: %Secret{verified?: true, secret: secret, open_secret: open_secret, key_hash: key_hash}} = changeset, true)
+  when secret |> is_binary() and secret != ""
+  and open_secret |> is_binary() and open_secret != ""
+  and (key_hash == nil or key_hash == "")
+  do
+    if verify_secret(open_secret, secret) do
+      changeset |> put_change(:key_hash, gen_key_hash(open_secret))
+    else
+      changeset
+    end
+  end
+
+  defp set_key_hash(%Ecto.Changeset{} = changeset, true) do
+    changeset
+  end
+
   def set_key_hash_changeset(secret) do
     Ecto.Changeset.change(secret, %{})
     |> verify_open_secret()
-    |> set_key_hash()
+    |> set_key_hash(true)
   end
 
   def secret_verified?(nil) do
