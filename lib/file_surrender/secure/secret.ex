@@ -9,7 +9,7 @@ defmodule FileSurrender.Secure.Secret do
   schema "secrets" do
     field :open_secret, :string, virtual: true
     field :new_secret, :string, virtual: true
-    field :secret, HashedField
+    field :secret, HashedField, read_after_writes: true
     field :verified?, :boolean, virtual: true, default: false
     # field :user_id, :id
     belongs_to :user, User
