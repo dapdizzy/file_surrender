@@ -11,11 +11,11 @@ defmodule Encryption.HashedField do
 
   def dump(value) do
     Logger.debug "Dumping hashed value [#{inspect value}]"
-    {:ok, hash(value)}
+    {:ok, hash(value) |> Base.encode64}
   end
 
   def load(value) do
-    {:ok, value}
+    {:ok, value |> Base.decode64!}
   end
 
   def verify_secret(open_secret, secret) do
@@ -28,7 +28,7 @@ defmodule Encryption.HashedField do
 
   defp hash(value) do
     salt = get_salt()
-    Argon2.Base.hash_password(value, salt, argon2_type: 1, format: :raw_hash)
+    Argon2.Base.hash_password(value, salt, argon2_type: 1, format: :encoded)
   end
 
 end

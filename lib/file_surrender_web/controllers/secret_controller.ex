@@ -11,6 +11,7 @@ defmodule FileSurrenderWeb.SecretController do
   plug :short_circuit_secret, [condition: &Secret.secret_verified?/1, message: "Your Secret has already been verified."] when action in [:verify, :verify_prompt]
   plug :short_circuit_secret, [condition: &Secret.has_secret?/1, message: "You already have your encryption Secret."] when action in [:create, :new]
   plug :short_circuit_secret, [condition: &Secret.has_no_secret?/1, message: "You do not have Secret value yet."] when action in [:edit, :update]
+  plug :short_circuit_secret, [condition: &Secret.has_no_secret?/1, message: "You do not have Secret value yet."] when action in [:delete]
 
   def show(conn, _params) do
     render conn, "show.html", secret: conn.assigns.secret
@@ -80,6 +81,18 @@ defmodule FileSurrenderWeb.SecretController do
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", secret: secret, changeset: changeset)
     end
+  end
+
+  def delete(conn, _params) do
+    secret = conn.assigns.secret
+    {:ok, _deleted_secret} = Secure.delete_secret(secret)
+
+    user = Guardian.Plug.current_resource(conn)
+    UsersCache.add(%{user|secret: nil})
+
+    conn
+    |> put_flash(:info, "Secret has been deleted!")
+    |> redirect(to: secret_path(conn, :show))
   end
 
   defp authorize_secret(%Plug.Conn{halted: true} = conn, _options) do
