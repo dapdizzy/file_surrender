@@ -101,11 +101,14 @@ defmodule FileSurrender.Secure.Secret do
 
   def set_key_hash(%Ecto.Changeset{valid?: true, changes: %{open_secret: open_secret}, data: %Secret{secret: secret}} = changeset) when secret == nil or secret == "" do
     #  This only works for the case when we create secret, i.e., have open_secret in changes and do not have secret value filled in data struct.
+    Logger.debug("set_key_hash: valid changeset with open_secret and empty secret value.")
     key_hash = gen_key_hash(open_secret)
+    Logger.debug("Generated key_hash [#{String.slice(key_hash, 0, 10)}..] for open_secret [#{open_secret}]")
     changeset |> put_change(:key_hash, key_hash)
   end
 
   def set_key_hash(%Ecto.Changeset{valid?: true, changes: changes, data: %Secret{open_secret: open_secret, verified?: true}} = changeset) do
+    Logger.debug("set_key_hash: Empty changes case.")
     if changes |> Map.equal?(%{}) do
       changeset |> put_change(:key_hash, gen_key_hash(open_secret))
       Logger.debug("Key_hash has been put to the user's secret!")
@@ -115,6 +118,7 @@ defmodule FileSurrender.Secure.Secret do
   end
 
   def set_key_hash(%Ecto.Changeset{} = changeset) do
+    Logger.debug("set_key_hash: passthrough case.")
     changeset
   end
 
