@@ -26,6 +26,11 @@ defmodule Encryption.EncryptedField do
     {:ok, value}
   end
 
+  def load("$V3$_" <> _value = secret) do
+    Logger.debug("V3 type value detected. No loading transformation is required. Decryption will take place in the view.")
+    {:ok, secret}
+  end
+
   def load("Editing" <> _tail = value) do
     {:ok, value}
   end
