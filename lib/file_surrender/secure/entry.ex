@@ -21,6 +21,7 @@ defmodule FileSurrender.Secure.Entry do
 
   @doc false
   def changeset(entry, attrs, true) do
+    Logger.debug "update changeset"
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
     entry
       |> cast(attrs, [:user_id, :name, :secret])
@@ -30,6 +31,7 @@ defmodule FileSurrender.Secure.Entry do
 
   # A clause not intended for update, rather for new entry creation in a form.
   def changeset(entry, attrs, false) do
+    Logger.debug "Init changeset"
     Logger.debug "entry: #{inspect entry}, attrs: #{inspect attrs}"
     entry
       |> cast(attrs, [:user_id, :name, :secret])
