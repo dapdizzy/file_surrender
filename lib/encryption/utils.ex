@@ -54,8 +54,10 @@ defmodule Encryption.Utils do
     <<init_vec_size::integer, raw::binary>> = payload
     {:ok, <<init_vector::binary-size(init_vec_size), cipher_text::binary>>} =
     decode(raw)
-    {:ok, val} = ExCrypto.decrypt(d_key, init_vector, cipher_text)
-    val
+    case ExCrypto.decrypt(d_key, init_vector, cipher_text) do
+      {:ok, val} -> val
+      {:error, error} -> "#{inspect error}"
+    end
   end
 
   defp decode_key(key, key_size) do
