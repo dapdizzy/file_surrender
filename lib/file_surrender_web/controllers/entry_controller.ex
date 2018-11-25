@@ -81,10 +81,31 @@ defmodule FileSurrenderWeb.EntryController do
     end
   end
 
+  defp secret_verified?(nil) do
+    false
+  end
+
+  defp secret_verified?(%{secret: nil}) do
+    false
+  end
+
+  defp secret_verified?(%{secret: %Secret{verified?: verified}}) do
+    verified
+  end
+
   def show(conn, _params) do
     # entry = Secure.get_entry!(id)
     entry = conn.assigns.entry
-    render(conn, "show.html", entry: entry)
+    if  (entry |> Entry.requires_verified_secret?)
+    && !(secret_verified?(Guardian.Plug.current_resource(conn))) do
+      conn
+      |> put_session(:unverified_secret_path, current_path(conn))
+      |> put_flash(:info, "You need to verify your Secret first.")
+      |> redirect(to: secret_path(conn, :verify_prompt))
+      |> halt
+    else
+      render(conn, "show.html", entry: entry)
+    end
   end
 
   def edit(conn, _params) do

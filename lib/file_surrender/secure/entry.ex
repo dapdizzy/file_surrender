@@ -77,6 +77,18 @@ defmodule FileSurrender.Secure.Entry do
     end
   end
 
+  def requires_verified_secret?(nil) do
+    false
+  end
+
+  def requires_verified_secret?(%Entry{secret: "$V3$_" <> _secret}) do
+    true
+  end
+
+  def requires_verified_secret?(%Entry{}) do
+    false
+  end
+
   @doc """
   Decrypts entry's secret value.
   """

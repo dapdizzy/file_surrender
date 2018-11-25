@@ -22,4 +22,5 @@ defmodule FileSurrender.Secure.User do
     |> validate_required([:uid_hash, :key_hash])
     |> unique_constraint(:uid_hash)
   end
+
 end
