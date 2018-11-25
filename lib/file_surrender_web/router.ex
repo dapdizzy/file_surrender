@@ -2,6 +2,24 @@ defmodule FileSurrenderWeb.Router do
   use FileSurrenderWeb, :router
 
   require Ueberauth
+  require Logger
+
+  defp redirect_to_unauthorized_path(%Plug.Conn{halted: true} = conn, _options) do
+    conn
+  end
+
+  defp redirect_to_unauthorized_path(conn, _options) do
+    if (path = get_session(conn, :unauthorized_path)) && (user = Guardian.Plug.current_resource(conn)) do
+      Logger.debug("A case with a captured unauthorized_path and a valid user (authorized) detected.")
+      Logger.debug("Redirecting to [#{path}]")
+      conn
+      |> delete_session(:unauthorized_path)
+      |> put_flash(:info, "Taking you back to where you've headed.")
+      |> redirect(to: path)
+    else
+      conn
+    end
+  end
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -13,6 +31,7 @@ defmodule FileSurrenderWeb.Router do
 
   pipeline :browser_auth do
     plug FileSurrender.AuthPipeline
+    plug :redirect_to_unauthorized_path
   end
 
   pipeline :api do

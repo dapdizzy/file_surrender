@@ -8,6 +8,7 @@ defmodule FileSurrender.AuthErrorHandler do
   def auth_error(conn, {type, reason}, _opts) do
     Logger.debug "Authentication error of type #{type}, reason: #{reason}"
     conn
+    |> put_session(:unauthorized_path, current_path(conn))
     # |> configure_session(drop: true)
     |> put_flash(:error, error_message(type, reason))
     |> redirect(to: "/")
