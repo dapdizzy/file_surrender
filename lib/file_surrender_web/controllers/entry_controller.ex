@@ -10,6 +10,7 @@ defmodule FileSurrenderWeb.EntryController do
   # plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
   plug FileSurrender.AuthUserPipeline
   plug :authorize_entry when action in [:edit, :update, :delete, :show]
+  plug :verify_secret when action in [:edit, :update, :delete, :show]
 
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
@@ -96,16 +97,16 @@ defmodule FileSurrenderWeb.EntryController do
   def show(conn, _params) do
     # entry = Secure.get_entry!(id)
     entry = conn.assigns.entry
-    if  (entry |> Entry.requires_verified_secret?)
-    && !(secret_verified?(Guardian.Plug.current_resource(conn))) do
-      conn
-      |> put_session(:unverified_secret_path, current_path(conn))
-      |> put_flash(:info, "You need to verify your Secret first.")
-      |> redirect(to: secret_path(conn, :verify_prompt))
-      |> halt
-    else
-      render(conn, "show.html", entry: entry)
-    end
+    # if  (entry |> Entry.requires_verified_secret?)
+    # && !(secret_verified?(Guardian.Plug.current_resource(conn))) do
+    #   conn
+    #   |> put_session(:unverified_secret_path, current_path(conn))
+    #   |> put_flash(:info, "You need to verify your Secret first.")
+    #   |> redirect(to: secret_path(conn, :verify_prompt))
+    #   |> halt
+    # else
+    render(conn, "show.html", entry: entry)
+    # end
   end
 
   def edit(conn, _params) do
@@ -175,5 +176,23 @@ defmodule FileSurrenderWeb.EntryController do
     |> put_flash(:error, "Entry not found.")
     |> redirect(to: entry_path(conn, :index))
     |> halt()
+  end
+
+  defp verify_secret(%Plug.Conn{halted: true} = conn, _options) do
+    conn
+  end
+
+  defp verify_secret(conn, _options) do
+    entry = conn.assigns[:entry]
+    if entry && (entry |> Entry.requires_verified_secret?)
+    && !(secret_verified?(Guardian.Plug.current_resource(conn))) do
+      conn
+      |> put_session(:unverified_secret_path, current_path(conn))
+      |> put_flash(:info, "You need to verify your Secret first.")
+      |> redirect(to: secret_path(conn, :verify_prompt))
+      |> halt
+    else
+      conn
+    end
   end
 end
