@@ -7,7 +7,8 @@ defmodule FileSurrenderWeb.EntryController do
 
   require Logger
 
-  plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
+  # plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
+  plug FileSurrender.AuthUserPipeline
   plug :authorize_entry when action in [:edit, :update, :delete, :show]
 
   def index(conn, _params) do
