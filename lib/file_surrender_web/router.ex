@@ -60,12 +60,14 @@ defmodule FileSurrenderWeb.Router do
     case conn |> get_session(:last_redirected_path) do
       nil -> conn
       path ->
-        if path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
+        if path != current_path(conn) and path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
           Logger.debug("Skipping redirection back from a redirected url")
           conn
           |> put_flash(:info, "If you wanna go back. we're taking you there, no problem.")
           |> delete_session(:last_redirected_path)
           |> assign(:skip_redirection, true)
+        else
+          conn
         end
     end
   end
