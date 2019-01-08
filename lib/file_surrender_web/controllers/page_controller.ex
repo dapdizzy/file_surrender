@@ -13,8 +13,8 @@ defmodule FileSurrenderWeb.PageController do
     user = Guardian.Plug.current_resource(conn)
     case user do
       %{internal_id: id} ->
-        has_none_or_any_secure_entries = !Secure.has_entries?(id) || Secure.has_secure_entries?(id)
-        process_user_with_no_or_secure_only_entries(conn, has_none_or_any_secure_entries, user)
+        # has_none_or_any_secure_entries = !Secure.has_entries?(id) || Secure.has_secure_entries?(id)
+        process_user_with_no_or_secure_only_entries(conn, true, user)
       nil ->
         conn
     end
@@ -29,11 +29,13 @@ defmodule FileSurrenderWeb.PageController do
       %{secret: nil} ->
         Logger.debug("No secret for a new user, navigate to secret creation right away.")
         conn
+        |> put_flash(:info, "We kindly ask you to setup your Secret Passphrase")
         |> redirect(to: secret_path(conn, :new))
         |> halt
       %{secret: %Secret{verified?: false}} ->
         Logger.debug("Unverified secret value. Redirecting to verify_prompt.")
         conn
+        |> put_flash(:info, "We kindly ask you to verify your Secret Passphrase first")
         |> redirect(to: secret_path(conn, :verify_prompt))
         |> halt
       _ ->
