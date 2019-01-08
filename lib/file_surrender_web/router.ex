@@ -104,7 +104,7 @@ defmodule FileSurrenderWeb.Router do
   defp process_no_secret_redirection(conn, secret) do
     prev_path = conn |> get_session(:prev_path)
     unless (prev_path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)])
-    and (current_path(conn) in [secret_path(conn, :new), secret_path(conn, :verify_prompt)]) do
+    or (current_path(conn) in [secret_path(conn, :new), secret_path(conn, :verify_prompt)]) do
       redirection_path = redirection_path(conn, secret)
       conn
       |> put_flash(:info, redirection_message(secret))
