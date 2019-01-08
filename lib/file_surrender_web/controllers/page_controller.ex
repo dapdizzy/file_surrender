@@ -10,9 +10,14 @@ defmodule FileSurrenderWeb.PageController do
   end
 
   defp redirect_to_secret_entry_or_verification(conn, _options) do
-    %{internal_id: id} = user = Guardian.Plug.current_resource(conn)
-    has_none_or_only_secure_entries = Secure.has_only_secure_entries?(id)
-    process_user_with_no_or_secure_only_entries(conn, has_none_or_only_secure_entries, user)
+    user = Guardian.Plug.current_resource(conn)
+    case user do
+      %{internal_id: id} ->
+        has_none_or_only_secure_entries = Secure.has_only_secure_entries?(id)
+        process_user_with_no_or_secure_only_entries(conn, has_none_or_only_secure_entries, user)
+      nil ->
+        conn
+    end
   end
 
   defp process_user_with_no_or_secure_only_entries(conn, false, _user) do
