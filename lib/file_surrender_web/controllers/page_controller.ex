@@ -41,7 +41,7 @@ defmodule FileSurrenderWeb.PageController do
     end
   end
 
-  plug :redirect_to_secret_entry_or_verification
+  # plug :redirect_to_secret_entry_or_verification
 
   # plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
 
