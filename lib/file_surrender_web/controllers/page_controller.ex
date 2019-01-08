@@ -45,23 +45,33 @@ defmodule FileSurrenderWeb.PageController do
   defp process_user_with_no_or_secure_only_entries(conn, true, user) do
     case user do
       %{secret: nil} ->
-        Logger.debug("No secret for a new user, navigate to secret creation right away.")
-        redirection_path = secret_path(conn, :new)
-        conn
-        |> put_flash(:info, "We kindly ask you to setup your Secret Passphrase")
-        |> put_session(:last_redirected_path, redirection_path)
-        |> put_session(:prev_path, current_path(conn))
-        |> redirect(to: redirection_path)
-        |> halt
+        prev_path = conn |> get_session(:prev_path)
+        unless prev_path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
+          Logger.debug("No secret for a new user, navigate to secret creation right away.")
+          redirection_path = secret_path(conn, :new)
+          conn
+          |> put_flash(:info, "We kindly ask you to setup your Secret Passphrase")
+          |> put_session(:last_redirected_path, redirection_path)
+          |> put_session(:prev_path, current_path(conn))
+          |> redirect(to: redirection_path)
+          |> halt
+        else
+          conn
+        end
       %{secret: %Secret{verified?: false}} ->
-        Logger.debug("Unverified secret value. Redirecting to verify_prompt.")
-        redirection_path = secret_path(conn, :verify_prompt)
-        conn
-        |> put_flash(:info, "We kindly ask you to verify your Secret Passphrase first")
-        |> put_session(:last_redirected_path, redirection_path)
-        |> put_session(:prev_path, current_path(conn))
-        |> redirect(to: redirection_path)
-        |> halt
+        prev_path = conn |> get_session(:prev_path)
+        unless prev_path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
+          Logger.debug("Unverified secret value. Redirecting to verify_prompt.")
+          redirection_path = secret_path(conn, :verify_prompt)
+          conn
+          |> put_flash(:info, "We kindly ask you to verify your Secret Passphrase first")
+          |> put_session(:last_redirected_path, redirection_path)
+          |> put_session(:prev_path, current_path(conn))
+          |> redirect(to: redirection_path)
+          |> halt
+        else
+          conn
+        end
       _ ->
         conn
     end

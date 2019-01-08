@@ -180,7 +180,7 @@ defmodule FileSurrenderWeb.SecretController do
     prev_path = conn |> get_session(:prev_path)
     if prev_path do
       conn |> assign(:prev_path, prev_path)
-      |> delete_session(:prev_path)
+      |> put_session(:prev_path, current_path(conn))
     else
       conn
     end
