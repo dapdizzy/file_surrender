@@ -129,7 +129,7 @@ defmodule FileSurrenderWeb.Router do
     raise "Unexpected secret value: #{inspect secret}"
   end
 
-  defp redirection_path(secret) do
+  defp redirection_path(conn, secret) do
     Logger.debug("Treating secret value [#{inspect secret}] as missing secret.")
     secret_path(conn, :new)
   end
