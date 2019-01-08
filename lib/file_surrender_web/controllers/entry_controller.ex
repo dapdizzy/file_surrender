@@ -31,19 +31,19 @@ defmodule FileSurrenderWeb.EntryController do
             Logger.debug("Got entries list by user id #{user.internal_id}")
             conn |> assign(:entries, list)
         end
-      if conn.assigns.entries
-      |> Enum.any?(fn %Entry{secret: secret} ->
-        case secret do
-          "$V3$_" <> _secret_part -> true
-          _ -> false
-        end
-      end) && unverified_secret?(user.secret, user) do
-        redirection_path = secret_path(conn, :verify_prompt)
-        conn
-        |> put_flash(:info, "Please verify your Secret first.")
-        |> redirect(to: redirection_path)
-        |> halt()
-      end
+      # if conn.assigns.entries
+      # |> Enum.any?(fn %Entry{secret: secret} ->
+      #   case secret do
+      #     "$V3$_" <> _secret_part -> true
+      #     _ -> false
+      #   end
+      # end) && unverified_secret?(user.secret, user) do
+      #   redirection_path = secret_path(conn, :verify_prompt)
+      #   conn
+      #   |> put_flash(:info, "Please verify your Secret first.")
+      #   |> redirect(to: redirection_path)
+      #   |> halt()
+      # end
       render(conn, "index.html", entries: conn.assigns.entries)
     else
       Logger.debug("Got nil user from Guardian for secure/entries index action.")
