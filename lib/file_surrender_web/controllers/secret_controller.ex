@@ -29,7 +29,7 @@ defmodule FileSurrenderWeb.SecretController do
         UsersCache.add(user |> Map.put(:secret, %{secret|verified?: true})) # This way we update the user map stored in the cache
         conn
         |> put_flash(:info, "Your secret has been successfuly created.")
-        |> redirect(to: "/")
+        |> redirect(to: entry_path(conn, :index))
       {:error, %Ecto.Changeset{} = changeset} ->
         render conn, "new.html", changeset: changeset
     end
