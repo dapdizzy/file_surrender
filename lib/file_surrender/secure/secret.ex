@@ -144,21 +144,21 @@ defmodule FileSurrender.Secure.Secret do
     |> set_key_hash(true)
   end
 
-  def secret_verified?(nil) do
-    false
-  end
-
   def secret_verified?(%Secret{verified?: verified}) do
     verified
   end
 
-  def has_secret?(boolean, nil) do
-    !boolean
+  def secret_verified?(_secret) do
+    false
   end
 
   def has_secret?(boolean, %Secret{secret: secret}) do
     has_secret = secret && secret != ""
     if boolean, do: has_secret, else: !has_secret
+  end
+
+  def has_secret?(boolean, _secret) do
+    !boolean
   end
 
   # Need thowse two due to limitations on the types of values (fucntions in particular) we can use in plugs.

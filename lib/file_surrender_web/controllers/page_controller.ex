@@ -30,14 +30,8 @@ defmodule FileSurrenderWeb.PageController do
   defp redirect_to_secret_entry_or_verification(conn, _options) do
     user = Guardian.Plug.current_resource(conn)
     case user do
-      %{internal_id: _id, secret: secret} ->
-        # has_none_or_any_secure_entries = !Secure.has_entries?(id) || Secure.has_secure_entries?(id)
-        needs_redirection =
-          case secret do
-            %Secret{verified?: verified} ->
-              !verified
-            _ -> true
-          end
+      %{secret: secret} ->
+        needs_redirection = !Secret.secret_verified?(secret)
         conn =
           if !needs_redirection do
             conn |> put_flash(:info, nil)
@@ -55,38 +49,47 @@ defmodule FileSurrenderWeb.PageController do
   end
 
   defp process_user_with_no_or_secure_only_entries(conn, true, user) do
-    case user do
-      %{secret: nil} ->
-        prev_path = conn |> get_session(:prev_path)
-        unless prev_path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
-          Logger.debug("No secret for a new user, navigate to secret creation right away.")
-          redirection_path = secret_path(conn, :new)
-          conn
-          |> put_flash(:info, "We kindly ask you to setup your Secret Passphrase")
-          |> put_session(:last_redirected_path, redirection_path)
-          |> put_session(:prev_path, current_path(conn))
-          |> redirect(to: redirection_path)
-          |> halt
-        else
-          conn
-        end
-      %{secret: %Secret{verified?: false}} ->
-        prev_path = conn |> get_session(:prev_path)
-        unless prev_path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
-          Logger.debug("Unverified secret value. Redirecting to verify_prompt.")
-          redirection_path = secret_path(conn, :verify_prompt)
-          conn
-          |> put_flash(:info, "We kindly ask you to verify your Secret Passphrase first")
-          |> put_session(:last_redirected_path, redirection_path)
-          |> put_session(:prev_path, current_path(conn))
-          |> redirect(to: redirection_path)
-          |> halt
-        else
-          conn
-        end
-      _ ->
-        conn
+    process_no_secret_redirection(conn, user.secret)
+  end
+
+  defp process_no_secret_redirection(conn, secret) do
+    prev_path = conn |> get_session(:prev_path)
+    unless prev_path in [secret_path(conn, :new), secret_path(conn, :verify_prompt)] do
+      redirection_path = redirection_path(conn, secret)
+      conn
+      |> put_flash(:info, redirection_message(secret))
+      |> put_session(:last_redirected_path, redirection_path)
+      |> put_session(:prev_path, current_path(conn))
+      |> redirect(to: redirection_path)
+      |> halt
+    else
+      conn
     end
+  end
+
+  defp redirection_path(conn, %Secret{verified?: false}) do
+    secret_path(conn, :verify_prompt)
+  end
+
+  defp redirction_path(conn, nil) do
+    secret_path(conn, :new)
+  end
+
+  defp redirection_path(conn, secret = %Secret{}) do
+    raise "Unexpected secret value: #{inspect secret}"
+  end
+
+  defp redirection_path(secret) do
+    Logger.debug("Treating secret value [#{inspect secret}] as missing secret.")
+    secret_path(conn, :new)
+  end
+
+  defp redirection_message(%Secret{verified?: false}) do
+    "We kindly ask you to verify your Secret Passphrase first"
+  end
+
+  defp redirection_message(_secret) do
+    "We kindly ask you to setup your Secret Passphrase"
   end
 
   plug :process_last_redirected_path
