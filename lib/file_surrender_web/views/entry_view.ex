@@ -17,7 +17,8 @@ defmodule FileSurrenderWeb.EntryView do
     Logger.debug("decrypting V3 (secret encrypted) value in view: [#{inspect value}]")
     %{secret: %Secret{verified?: true, open_secret: encryption_secret, key_hash: key_hash}} = UsersCache.get!(user_id)
     import Encryption.Utils, only: [decrypt: 3]
-    decrypt(encryption_secret, key_hash, secret) <> " (V3 Secret encrypted value)"
+    decrypt(encryption_secret, key_hash, secret)
+     # <> " (V3 Secret encrypted value)"
     # "V3 value as is: " <> String.slice(secret, 0, 10) <> "..."
   end
 

@@ -10,6 +10,7 @@ defmodule FileSurrenderWeb.EntryController do
   # plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
   plug FileSurrender.AuthUserPipeline
   plug :authorize_entry when action in [:edit, :update, :delete, :show]
+  plug :require_secret
   plug :verify_secret when action in [:edit, :update, :delete, :show]
 
   def index(conn, _params) do
@@ -194,5 +195,42 @@ defmodule FileSurrenderWeb.EntryController do
     else
       conn
     end
+  end
+
+  defp require_secret(%Plug.Conn{halted: true} = conn, _options) do
+    conn
+  end
+
+  defp require_secret(conn, _options) do
+    user = Guardian.Plug.current_resource(conn)
+    unless Secure.has_entries_by_uid(user.id) || Secure.has_entries?(user.internal_id) do
+      case user do
+        %{secret: nil} -> conn |> process_secret_required
+        %{secret: %{verified?: verified}} ->
+          process_secret_verified conn, verified
+      end
+    else
+      conn
+    end
+  end
+
+  defp process_secret_required(conn) do
+    conn
+    |> put_flash(:info, "First, you need to define your Secret")
+    |> put_session(:unverified_secret_path, current_path(conn))
+    |> redirect(to: secret_path(conn, :new))
+    |> halt
+  end
+
+  defp process_secret_verified(conn, true) do
+    conn
+  end
+
+  defp process_secret_verified(conn, false) do
+    conn
+    |> put_flash(:info, "You need to verify your Secret first")
+    |> put_session(:unverified_secret_path, current_path(conn))
+    |> redirect(to: secret_path(conn, :verify_prompt))
+    |> halt
   end
 end

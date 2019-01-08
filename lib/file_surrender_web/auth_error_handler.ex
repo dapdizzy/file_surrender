@@ -10,7 +10,7 @@ defmodule FileSurrender.AuthErrorHandler do
     conn
     |> put_session(:unauthorized_path, current_path(conn))
     # |> configure_session(drop: true)
-    |> put_flash(:error, error_message(type, reason))
+    |> put_flash(:info, error_message(type, reason))
     |> redirect(to: "/")
   end
 

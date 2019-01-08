@@ -46,6 +46,19 @@ defmodule FileSurrender.Secure do
     Repo.all(query)
   end
 
+  def has_only_secure_entries?(id) do
+    Logger.debug("Querying whether the user (#{id}) has only secure encrypted entries or has none.")
+    query = (from e in Entry, where: e.user_id == ^id and not like(e.secret, "$V3$_%"), limit: 1)
+    Repo.one(query) == nil
+  end
+
+  @doc """
+  Denotes whether there are any entries related to user.internal_id
+  """
+  def has_entries?(internal_user_id) do
+    list_entries_by_id(internal_user_id, true)
+  end
+
   defp conditional(query, condition, adorner) do
     if condition do
       query |> adorner.()

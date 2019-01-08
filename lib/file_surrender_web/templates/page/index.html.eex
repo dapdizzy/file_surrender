@@ -1,6 +1,13 @@
 <div class="jumbotron">
-  <h2><%= gettext "Welcome to %{name}!", name: "Phoenix" %></h2>
-  <p class="lead">A productive web framework that<br />does not compromise speed and maintainability.</p>
+  <h2><%= gettext "Welcome to %{name}!", name: "File-Surrender" %></h2>
+  <p class="lead">
+    A place where you can keep you secret passwords secure in the cloud.<br/>
+    The concept is simple: you sign in using your existing user account on Google, Facebook, VK, etc.<br/>
+    When signed in for the first time, we ask you to specify your secret passphrase which will serve as the key<br/>
+    for encrypting/decrypting your data.<br/>
+    No part of your user ID or passphrase will be stored as plain text.<br/>
+    So your data cannot be deciphered even by the database owner.
+  </p>
 </div>
 
 
@@ -60,8 +67,10 @@
     <h2>Welcome, <%= @current_user.name %>!</h2>
     <img src="<%= @current_user.avatar %>" class="img-circle"/>
     <br>
-    <%= button "Logout", to: auth_path(@conn, :delete), method: :delete, class: "btn btn-danger" %>
-    <br>
+    <%= unless @has_entries do %>
+    <h4>We are so glad to see you here! In a place where you can keep your passwords or any other secure data safely encrypted.</h4>
+    <h6>Now you should go ahead and define your Secret value that is your internal password (or passphrase) that will be used to encrypt/decrypt your data.</h6>
+    <% else %>
     <%= if @action_required do %>
       <p class="alert alert-danger" role="alert">Action required!</p>
     <% end %>
@@ -71,8 +80,11 @@
     <%= if verification_required? @secret do %>
       <p class="alert alert-danger" role="alert">Secret verification required</p>
     <% end %>
-    <span><%= link "Secret passphrase", to: secret_path(@conn, :show), class: "btn btn-link" %></span>
-    <span><%= link "Secret", to: entry_path(@conn, :index), class: "btn btn-link" %></span>
+    <% end %>
+    <span><%= link "Secret passphrase", to: secret_path(@conn, :show), class: "btn btn-primary" %></span>
+    <span><%= link "Secret", to: entry_path(@conn, :index), class: "btn btn-primary" %></span>
+    <br>
+    <%= button "Logout", to: auth_path(@conn, :delete), method: :delete, class: "btn btn-danger" %>
   <% else %>
     <!-- <a class="btn btn-primary btn-lg" href="/auth/google">
       <i class="fa fa-google"></i>
