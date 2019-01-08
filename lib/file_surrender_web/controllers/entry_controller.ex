@@ -11,6 +11,7 @@ defmodule FileSurrenderWeb.EntryController do
   plug FileSurrender.AuthUserPipeline
   plug :authorize_entry when action in [:edit, :update, :delete, :show]
   plug :require_secret
+  plug :put_prev_path_to_assigns
   plug :verify_secret when action in [:edit, :update, :delete, :show]
 
   def index(conn, _params) do
@@ -232,5 +233,18 @@ defmodule FileSurrenderWeb.EntryController do
     |> put_session(:unverified_secret_path, current_path(conn))
     |> redirect(to: secret_path(conn, :verify_prompt))
     |> halt
+  end
+
+  defp put_prev_path_to_assigns(%Plug.Conn{halted: true} = conn, _options) do
+    conn
+  end
+
+  defp put_prev_path_to_assigns(conn, _options) do
+    prev_path = conn |> get_session(:prev_path)
+    if prev_path do
+      conn |> assign(:prev_path, prev_path)
+    else
+      conn
+    end
   end
 end
