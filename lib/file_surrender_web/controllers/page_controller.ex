@@ -50,6 +50,7 @@ defmodule FileSurrenderWeb.PageController do
         conn
         |> put_flash(:info, "We kindly ask you to setup your Secret Passphrase")
         |> put_session(:last_redirected_path, redirection_path)
+        |> assign(:prev_path, current_path(conn))
         |> redirect(to: redirection_path)
         |> halt
       %{secret: %Secret{verified?: false}} ->
