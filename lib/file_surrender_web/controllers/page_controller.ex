@@ -30,9 +30,21 @@ defmodule FileSurrenderWeb.PageController do
   defp redirect_to_secret_entry_or_verification(conn, _options) do
     user = Guardian.Plug.current_resource(conn)
     case user do
-      %{internal_id: _id} ->
+      %{internal_id: _id, secret: secret} ->
         # has_none_or_any_secure_entries = !Secure.has_entries?(id) || Secure.has_secure_entries?(id)
-        process_user_with_no_or_secure_only_entries(conn, !conn.assigns[:skip_redirection], user)
+        needs_redirection =
+          case secret do
+            %Secret{verified?: verified} ->
+              !verified
+            _ -> true
+          end
+        conn =
+          if !needs_redirection do
+            conn |> put_flash(:info, nil)
+          else
+            conn
+          end
+        process_user_with_no_or_secure_only_entries(conn, needs_redirection && !conn.assigns[:skip_redirection], user)
       nil ->
         conn
     end
