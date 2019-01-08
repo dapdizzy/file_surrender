@@ -48,7 +48,7 @@ defmodule FileSurrenderWeb.PageController do
   def index(conn, _params) do
     user = Guardian.Plug.current_resource(conn)
     action_required = !!(user && Secure.has_entries_by_uid(user.id))
-    has_entries_by_id = Secure.has_entries?(user.internal_id)
+    has_entries_by_id = (user && Secure.has_entries?(user.internal_id)) || false
     render conn, "index.html", current_user: user, action_required: action_required, secret: user && user.secret, has_entries: action_required || has_entries_by_id
     # , code: get_session(conn, :code)
   end
