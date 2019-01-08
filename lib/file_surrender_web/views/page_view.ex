@@ -3,19 +3,19 @@ defmodule FileSurrenderWeb.PageView do
 
   alias FileSurrender.Secure.Secret
 
-  def secret_required?(nil) do
-    true
-  end
-
   def secret_required?(%Secret{}) do
     false
   end
 
-  def verification_required?(nil) do
-    false
+  def secret_required?(_) do
+    true
   end
 
   def verification_required?(%Secret{verified?: verified}) do
     !verified
+  end
+
+  def verification_required?(_) do
+    false
   end
 end
