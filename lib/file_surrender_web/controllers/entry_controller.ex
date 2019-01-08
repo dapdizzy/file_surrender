@@ -38,9 +38,10 @@ defmodule FileSurrenderWeb.EntryController do
           _ -> false
         end
       end) && unverified_secret?(user.secret, user) do
+        redirection_path = secret_path(conn, :verify_prompt)
         conn
         |> put_flash(:info, "Please verify your Secret first.")
-        |> redirect(to: secret_path(conn, :verify_prompt))
+        |> redirect(to: redirection_path)
         |> halt()
       end
       render(conn, "index.html", entries: conn.assigns.entries)

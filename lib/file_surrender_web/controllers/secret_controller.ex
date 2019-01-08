@@ -206,4 +206,8 @@ defmodule FileSurrenderWeb.SecretController do
         |> halt
     end
   end
+
+  def secret_path_export(conn, function) do
+    secret_path(conn, function)
+  end
 end
