@@ -7,6 +7,7 @@ defmodule FileSurrenderWeb.SecretController do
   require Logger
 
   plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
+  plug :put_prev_path_to_assigns
   plug :authorize_secret
   plug :short_circuit_secret, [condition: &Secret.secret_verified?/1, message: "Your Secret has already been verified."] when action in [:verify, :verify_prompt]
   plug :short_circuit_secret, [condition: &Secret.has_secret?/1, message: "You already have your encryption Secret."] when action in [:create, :new]
@@ -168,5 +169,18 @@ defmodule FileSurrenderWeb.SecretController do
     |> put_flash(:info, "Your Secret already is verified!")
     |> redirect(to: entry_path(conn, :index))
     |> halt
+  end
+
+  defp put_prev_path_to_assigns(%Plug.Conn{halted: true} = conn, _options) do
+    conn
+  end
+
+  defp put_prev_path_to_assigns(conn, _options) do
+    prev_path = conn |> get_session(:prev_path)
+    if prev_path do
+      conn |> assign(:prev_path, prev_path)
+    else
+      conn
+    end
   end
 end
