@@ -30,7 +30,7 @@ defmodule FileSurrenderWeb.PageController do
   defp redirect_to_secret_entry_or_verification(conn, _options) do
     user = Guardian.Plug.current_resource(conn)
     case user do
-      %{internal_id: id} ->
+      %{internal_id: _id} ->
         # has_none_or_any_secure_entries = !Secure.has_entries?(id) || Secure.has_secure_entries?(id)
         process_user_with_no_or_secure_only_entries(conn, !conn.assigns[:skip_redirection], user)
       nil ->
@@ -55,9 +55,12 @@ defmodule FileSurrenderWeb.PageController do
         |> halt
       %{secret: %Secret{verified?: false}} ->
         Logger.debug("Unverified secret value. Redirecting to verify_prompt.")
+        redirection_path = secret_path(conn, :verify_prompt)
         conn
         |> put_flash(:info, "We kindly ask you to verify your Secret Passphrase first")
-        |> redirect(to: secret_path(conn, :verify_prompt))
+        |> put_session(:last_redirected_path, redirection_path)
+        |> put_session(:prev_path, current_path(conn))
+        |> redirect(to: redirection_path)
         |> halt
       _ ->
         conn
