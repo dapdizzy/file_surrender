@@ -9,6 +9,7 @@ defmodule FileSurrenderWeb.SecretController do
   plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
   plug :put_prev_path_to_assigns
   plug :authorize_secret
+  plug :create_secret_first when action in [:index]
   plug :short_circuit_secret, [condition: &Secret.secret_verified?/1, message: "Your Secret has already been verified."] when action in [:verify, :verify_prompt]
   plug :short_circuit_secret, [condition: &Secret.has_secret?/1, message: "You already have your encryption Secret."] when action in [:create, :new]
   plug :short_circuit_secret, [condition: &Secret.has_no_secret?/1, message: "You do not have Secret value yet."] when action in [:edit, :update]
@@ -179,8 +180,30 @@ defmodule FileSurrenderWeb.SecretController do
     prev_path = conn |> get_session(:prev_path)
     if prev_path do
       conn |> assign(:prev_path, prev_path)
+      |> delete_session(:prev_path)
     else
       conn
+    end
+  end
+
+  defp create_secret_first(%Plug.Conn{halted: true} = conn, _options) do
+    conn
+  end
+
+  defp create_secret_first(conn, _options) do
+    user = Guardian.Plug.current_resource(conn)
+    do_create_secret_for_user conn, user
+  end
+
+  defp do_create_secret_for_user(conn, user) do
+    case user do
+      %{secret: %Secret{}} ->
+        conn
+      _ ->
+        Logger.debug("Kindly navigate to Secret passphrase creation first.")
+        conn
+        |> redirect(to: secret_path(conn, :new))
+        |> halt
     end
   end
 end
