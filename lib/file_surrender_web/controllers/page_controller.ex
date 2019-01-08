@@ -13,8 +13,8 @@ defmodule FileSurrenderWeb.PageController do
     user = Guardian.Plug.current_resource(conn)
     case user do
       %{internal_id: id} ->
-        has_none_or_only_secure_entries = Secure.has_only_secure_entries?(id)
-        process_user_with_no_or_secure_only_entries(conn, has_none_or_only_secure_entries, user)
+        has_none_or_any_secure_entries = !Secure.has_entries?(id) || Secure.has_secure_entries?(id)
+        process_user_with_no_or_secure_only_entries(conn, has_none_or_any_secure_entries, user)
       nil ->
         conn
     end
@@ -41,7 +41,7 @@ defmodule FileSurrenderWeb.PageController do
     end
   end
 
-  # plug :redirect_to_secret_entry_or_verification
+  plug :redirect_to_secret_entry_or_verification
 
   # plug Guardian.Plug.EnsureAuthenticated, handler: __MODULE__
 

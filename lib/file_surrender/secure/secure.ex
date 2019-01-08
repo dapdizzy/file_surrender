@@ -46,6 +46,12 @@ defmodule FileSurrender.Secure do
     Repo.all(query)
   end
 
+  def has_secure_entries?(id) do
+    Logger.debug("Determine whether the user (#{id}) has any secure entries.")
+    query = (from e in Entry, where: e.user_id == ^id and like(e.secret, "$V3$_%"), limit: 1)
+    Repo.one(query) != nil
+  end
+
   def has_only_secure_entries?(id) do
     Logger.debug("Querying whether the user (#{id}) has only secure encrypted entries or has none.")
     query = (from e in Entry, where: e.user_id == ^id and not like(e.secret, "$V3$_%"), limit: 1)
